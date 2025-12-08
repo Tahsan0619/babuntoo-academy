@@ -1,251 +1,342 @@
 # Babuntoo Academy
 
-Babuntoo Academy is an educational mobile application built with Flutter, designed to make learning programming and technology concepts engaging and interactive. It offers a comprehensive curriculum, particularly focused on the C programming language, alongside modules for Python, computer fundamentals, and insights into the world of technology.
+A comprehensive Flutter educational application designed to teach computer science fundamentals, programming languages, hardware components, software knowledge, and inspiring stories of scientists.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Learning Modules](#learning-modules)
-    - [C Programming](#c-programming)
-    - [Python Programming](#python-programming)
-    - [Problem Solving](#problem-solving)
-    - [Computer Fundamentals](#computer-fundamentals)
-    - [Tech Insights](#tech-insights)
-- [Interactive Elements](#interactive-elements)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation & Running](#installation--running)
-- [Contribution](#contribution)
-- [License](#license)
-
-## Overview
-
-Babuntoo Academy aims to provide a structured and user-friendly platform for students and enthusiasts to learn programming from the ground up. The application breaks down complex topics into digestible lessons, interactive exercises, and problem-solving challenges. With a strong emphasis on visual learning and hands-on practice, it strives to build a solid foundation in software development and computer science.
-
-## Features
-
-*   Comprehensive C Language Course: From syntax basics to advanced problem-solving.
-*   Introduction to Python: A dedicated module for learning Python fundamentals.
-*   Interactive Learning Modules: Engaging pages for understanding operators, control flow, data types, and more.
-*   Problem-Solving Arena: A collection of programming problems to test and enhance coding skills.
-*   Coding Playground: A space to experiment with code snippets.
-*   Challenge Mode: Quizzes or coding challenges to assess understanding.
-*   Computer Fundamentals: Learn about computer hardware (extensive image library included) and software.
-*   Tech History & Inventions: Explore timelines of scientists (extensive image library included) and recent technological advancements (with illustrative images).
-*   User-Friendly Interface: Intuitive navigation, custom-designed widgets (like `circular_menu`), and animated text effects.
-*   Responsive Design: Utilizes `flutter_screenutil` for adapting to various screen sizes.
-*   Video Splash Screen: Engaging video introduction (`splash.mp4`).
-*   Progress Tracking (Assumed): Users can likely track their learning progress.
-*   Contact/Support: A dedicated page for users to get in touch.
-
-## Learning Modules
-
-The application is broadly divided into the following learning sections:
-
-### C Programming (`lib/interactive_learning/`)
-
-*   Basics:
-    *   Basic of C('syntax_of_c_page.dart')
-    *   Variables (`variable_page.dart`)
-    *   Integer and Float Data Types (`int_and_float_page.dart`)
-    *   Character Data Types and Format Specifiers (`char_and_format_specifiers_page.dart`)
-    *   Input/Output: `printf` and `scanf` (`printf_and_scanf_page.dart`)
-*   Operators (`lib/interactive_learning/operators/`):
-    *   Arithmetic Operators (`arithmetic_operators_page.dart`)
-    *   Relational Operators (`relational_operators_page.dart`)
-    *   Logical Operators (`logical_operators_page.dart`)
-    *   Bitwise Operators (`bitwise_operators_page.dart`)
-*   Conditional Statements (`lib/interactive_learning/conditional/`):
-    *   If-Else (`if_else_page.dart`)
-    *   Switch Case (`switch_page.dart`)
-    *   Ternary Operator (`ternary_operator.dart`)
-*   Loops (`lib/interactive_learning/loops/`):
-    *   For Loop (`for_loop_page.dart`)
-    *   While Loop (`while_loop_page.dart`)
-    *   Do-While Loop (`do_while_loop_page.dart`)
-*   Menus for C Learning:
-    *   Main C Learning Menu (`learn_c_page.dart`, `interactive_learning_menu_page.dart`)
-    *   Operators Menu (`operators_menu_page.dart`)
-    *   Conditional Statements Menu (`conditional_operator_menu_page.dart`)
-    *   Loops Menu (`loop_menu_page.dart`)
-
-### Python Programming
-
-*   Dedicated learning module (`learn_python_page.dart`). 
-
-### Problem Solving (`lib/interactive_learning/problem_solving_part1/`)
-
-A series of interactive problems designed to apply learned concepts:
-*   Problem 1 to Problem 7 (`problem1_page.dart` ... `problem7_page.dart`)
-*   Menu for Problem Solving (`problem1_menu_page.dart`)
-
-### Computer Fundamentals
-
-*   Hardware Concepts (`hardware_page.dart`)
-*   Software Concepts (`software_page.dart`)
-
-### Tech Insights
-
-*   Latest Inventions (`latest_inventions_page.dart`)
-*   Scientists Timeline (`scientists_timeline_page.dart`)
-*   Overview of Programming Languages (`programming_languages_page.dart`)
-
-## Interactive Elements
-
-*   Challenges (`lib/challenge/`):
-    *   `challenge_page.dart`: Interface for challenges.
-    *   `challenge_controller.dart`: Manages challenge logic.
-    *   `challenge_data.dart`, `challenge_model.dart`: Data and models for challenges.
-*   Playground (`lib/playground/`):
-    *   `playground_page.dart`: UI for the coding playground.
-    *   `playground_controller.dart`: Handles playground logic.
-    *   `playground_service.dart`, `playground_model.dart`: Services and data models for the playground.
-    *   Potentially uses `webview_flutter` for code execution or display.
-
-## Technology Stack
-
-*   Framework: Flutter (`sdk: ">=3.0.0 <4.0.0"`)
-*   Language: Dart
-*   Key Flutter Packages & Libraries:
-    *   `material.dart` (Implicitly via `flutter: sdk: flutter` for Material Design UI components)
-    *   `cupertino_icons: ^1.0.2` (For iOS-style icons)
-    *   `url_launcher: ^6.2.1` (For launching URLs)
-    *   `package_info_plus: ^4.2.0` (For querying app package information)
-    *   `provider: ^6.1.0` (For state management)
-    *   `webview_flutter: ^4.4.2` (For embedding web content)
-    *   `circular_menu: ^2.0.1` (For creating circular menu widgets)
-    *   `video_player: ^2.8.2` (For playing videos, likely used in `splash.mp4`)
-    *   `font_awesome_flutter: ^10.7.0` (For a wide range of additional icons)
-    *   `animated_text_kit: ^4.2.2` (For creating animated text effects)
-    *   `flutter_screenutil: ^5.9.0` (For adapting UI to different screen sizes and densities)
-*   Development Tools:
-    *   Android Studio
-*   Dev Dependencies:
-    *   `flutter_test: sdk: flutter` (For widget and unit testing)
-    *   `flutter_lints: ^2.0.0` (For static analysis and code style enforcement)
-    *   `flutter_launcher_icons: ^0.13.1` (For generating app launcher icons)
-    *   `mockito: ^5.4.2` (For creating mock objects in tests)
-*   Assets:
-    *   Extensive image assets for hardware components, scientists, and inventions (see `pubspec.yaml` for full list).
-    *   Video asset for splash screen (`assets/splash.mp4`).
-    *   Custom fonts: `Roboto` and `SourceCodePro` (defined in `assets/fonts/`).
-
-## Project Structure
-
-project_root/
-│
-├── lib/
-│   ├── challenge/
-│   │   ├── challenge_controller.dart
-│   │   ├── challenge_data.dart
-│   │   ├── challenge_model.dart
-│   │   └── challenge_page.dart
-│   │
-│   ├── interactive_learning/
-│   │   ├── conditional/
-│   │   │   ├── if_else_page.dart
-│   │   │   ├── switch_page.dart
-│   │   │   └── ternary_operator.dart
-│   │   │
-│   │   ├── loops/
-│   │   │   ├── do_while_loop_page.dart
-│   │   │   ├── for_loop_page.dart
-│   │   │   └── while_loop_page.dart
-│   │   │
-│   │   ├── menu/
-│   │   │   ├── conditional_operator_menu_page.dart
-│   │   │   ├── loop_menu_page.dart
-│   │   │   ├── operators_menu_page.dart
-│   │   │   └── problem1_menu_page.dart
-│   │   │
-│   │   ├── operators/
-│   │   │   ├── arithmetic_operators_page.dart
-│   │   │   ├── bitwise_operators_page.dart
-│   │   │   ├── logical_operators_page.dart
-│   │   │   └── relational_operators_page.dart
-│   │   │
-│   │   ├── problem_solving_part1/
-│   │   │   ├── problem1_page.dart
-│   │   │   ├── problem2_page.dart
-│   │   │   ├── problem3_page.dart
-│   │   │   ├── problem4_page.dart
-│   │   │   ├── problem5_page.dart
-│   │   │   ├── problem6_page.dart
-│   │   │   └── problem7_page.dart
-│   │   │
-│   │   ├── char_and_format_specifiers_page.dart
-│   │   ├── int_and_float_page.dart
-│   │   ├── interactive_learning_menu_page.dart
-│   │   ├── printf_and_scanf_page.dart
-│   │   ├── syntax_of_c_page.dart
-│   │   └── variable_page.dart
-│   │
-│   ├── playground/
-│   │   ├── playground_controller.dart
-│   │   ├── playground_model.dart
-│   │   ├── playground_page.dart
-│   │   └── playground_service.dart
-│   │
-│   ├── utils/
-│   │   ├── constants.dart
-│   │   ├── data_models.dart
-│   │   ├── navigation_service.dart
-│   │   └── theme_service.dart 
-│   │
-│   ├── widgets/
-│   │   ├── circular_logo_menu.dart
-│   │   ├── custom_card.dart
-│   │   ├── image_viewer.dart
-│   │   ├── menu.dart
-│   │   ├── progress_bar.dart
-│   │   └── responsive_layout.dart
-│   │
-│   ├── contact_us_page.dart
-│   ├── hardware_page.dart
-│   ├── home_page.dart
-│   ├── latest_inventions_page.dart
-│   ├── learn_c_page.dart
-│   ├── learn_programming_menu_page.dart
-│   ├── learn_python_page.dart
-│   ├── main.dart
-│   ├── programming_languages_page.dart
-│   ├── scientists_timeline_page.dart
-│   ├── software_page.dart
-│   └── splash_screen.dart
-│
-├── README.md
-├── pubspec.yaml
-
-## Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+## 🚀 Quick Start - Setup & Run on Your Local Device
 
 ### Prerequisites
 
-*   Flutter SDK: Version `3.0.0` or higher, but less than `4.0.0`. You can find installation instructions on the [official Flutter website](https://flutter.dev/docs/get-started/install).
-*   IDE:
-    *   Android Studio (with the Flutter and Dart plugins installed).
-*   An Android Emulator or a physical Android device.
+Before you begin, ensure you have the following installed:
 
-### Installation & Running
+1. **Flutter SDK** (3.0 or higher)
+   - Download from: https://flutter.dev/docs/get-started/install
+   - Verify installation: `flutter --version`
 
-1.  Obtain the Source Code via permission:
-    Run it in local machine via android studio:
-This will build and install the application on your selected virtual device/emulator.
+2. **Dart** (included with Flutter)
+   - Verify: `dart --version`
 
-## Developer
+3. **Git**
+   - Download from: https://git-scm.com/
 
-This application was solely developed by Md Tahsan Islam.
+4. **IDE/Editor** (choose one)
+   - Android Studio (recommended)
+   - VS Code with Flutter extension
+   - IntelliJ IDEA
 
-## Contribution
+5. **Android/iOS Setup**
+   - For Android: Android Studio with SDK 21+
+   - For iOS: Xcode 12+ (Mac only)
 
-Currently, Md Tahsan Islam is the sole developer of BabunToo Academy. If you have suggestions, feedback, or encounter any issues, please feel free to reach out or open an issue on the project's repository (if applicable).
 
-## License
 
-Copyright © 2025 Md Tahsan Islam
-All Rights Reserved.
-This project is proprietary and closed source. Permission is not granted to copy, modify, distribute, or sublicense the software without the express written permission of the copyright holder, Md Tahsan Islam.
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/Tahsan0619/babuntoo-academy.git
+cd babuntoo_academy
+```
+
+### Step 2: Install Dependencies
+
+```bash
+flutter pub get
+```
+
+This command downloads all required packages listed in `pubspec.yaml`.
+
+### Step 3: Configure API Keys (Optional)
+
+If you want to use the Code Playground feature:
+
+1. Open `lib/code_playground_screen.dart`
+2. Find line 9:
+   ```dart
+   const _groqKeyStorageKey = 'YOUR_GROQ_API_KEY_HERE';
+   ```
+3. Replace `YOUR_GROQ_API_KEY_HERE` with your actual Groq API key
+4. Or the app will prompt you to enter it on first launch
+
+### Step 4: Run the App
+
+#### On Android Device/Emulator:
+```bash
+flutter run
+```
+
+#### On iOS Device/Simulator (Mac only):
+```bash
+flutter run -d ios
+```
+
+#### On Web Browser:
+```bash
+flutter run -d chrome
+```
+
+#### On Windows/Linux (Desktop):
+```bash
+flutter run -d windows
+# or
+flutter run -d linux
+```
+
+### Step 5: View the App
+
+The app will launch with:
+- **Splash Screen**: Loading animation
+- **Login/Signup**: Create or access your account
+- **Home Menu**: Access all features
+
+---
+
+## 📚 How to Use the App
+
+### Main Features
+
+#### 1. **Hardware Learning**
+- Navigate: Home → Hardware
+- Learn about CPUs, GPUs, RAM, Storage, and Peripherals
+- View detailed diagrams and specifications
+
+#### 2. **Software Catalog**
+- Navigate: Home → Software
+- Browse popular applications by category
+- Learn software functionalities
+
+#### 3. **Learn Programming**
+- Navigate: Home → Learn Programming
+- Choose between C or Python
+- Access interactive tutorials with examples
+
+#### 4. **Code Playground**
+- Navigate: Home → Code Playground
+- Write and execute code snippets
+- Get AI-powered explanations
+- Supports Python and C
+
+#### 5. **Scientists Timeline**
+- Navigate: Home → Scientists
+- Discover famous scientists and their contributions
+- Browse historical timeline
+
+#### 6. **Latest Inventions**
+- Navigate: Home → Latest Inventions
+- Stay updated with cutting-edge technology
+
+#### 7. **Interactive Learning**
+- Navigate: Home → Interactive Learning
+- Deep dive into C programming topics
+- Topics include:
+  - Basics (Variables, Data Types, I/O)
+  - Operators (Arithmetic, Logical, Bitwise)
+  - Control Flow (if/else, switch)
+  - Loops (for, while, do-while)
+  - Functions & Recursion
+  - Pointers & Arrays
+  - Strings & Memory Management
+  - And more...
+
+#### 8. **Games**
+- Navigate: Home → Games
+- Play educational games (Hangman, etc.)
+- Test your knowledge
+
+#### 9. **Challenges**
+- Navigate: Home → Challenges
+- Solve programming challenges
+- Track your progress
+
+---
+
+## 🛠️ Troubleshooting
+
+### Issue: "flutter: command not found"
+**Solution**: Add Flutter to your PATH
+- Windows: Add Flutter\bin to system Environment Variables
+- Mac/Linux: Add to ~/.bashrc or ~/.zshrc
+  ```bash
+  export PATH="$PATH:~/path/to/flutter/bin"
+  ```
+
+### Issue: "No devices found"
+**Solution**:
+```bash
+flutter devices  # List connected devices
+flutter emulators  # List available emulators
+flutter emulators --launch <emulator_name>  # Launch emulator
+```
+
+### Issue: "Package version conflict"
+**Solution**:
+```bash
+flutter clean
+flutter pub get
+flutter pub upgrade
+```
+
+### Issue: "API Key not working"
+**Solution**:
+- Verify your Groq API key is valid
+- Check internet connection
+- Make sure key is set in `lib/code_playground_screen.dart`
+
+### Issue: App crashes on launch
+**Solution**:
+```bash
+flutter clean
+flutter pub get
+flutter run --verbose  # Shows detailed error messages
+```
+
+---
+
+## 📦 Project Structure
+
+```
+lib/
+├── main.dart                    # App entry point
+├── home_page.dart              # Main menu
+├── hardware_page.dart          # Hardware learning
+├── software_page.dart          # Software catalog
+├── scientists_timeline_page.dart
+├── latest_inventions_page.dart
+├── code_playground_screen.dart # AI Code execution
+├── interactive learning/       # Interactive tutorials
+│   └── C/
+│       ├── basics/
+│       ├── operators/
+│       ├── loops/
+│       ├── functions/
+│       ├── pointers/
+│       ├── arrays/
+│       └── ...
+├── challenge/                  # Programming challenges
+├── games/                      # Educational games
+├── education/                  # Learning models
+├── widgets/                    # Reusable components
+├── models/                     # Data models
+└── utils/                      # Utilities & constants
+```
+
+---
+
+## 💡 Tips for Development
+
+### Hot Reload
+Press `r` in terminal to hot reload (fast UI changes)
+```bash
+flutter run
+# Then press 'r' to reload
+# Press 'R' to restart the app
+```
+
+### Debug Mode
+Run with more information:
+```bash
+flutter run --verbose
+flutter run --debug  # Default
+```
+
+### Release Build
+Create optimized build:
+```bash
+flutter build apk          # Android
+flutter build ios          # iOS
+flutter build web          # Web
+flutter build windows      # Windows
+```
+
+### View App on Real Device
+1. Connect device via USB
+2. Enable Developer Mode on device
+3. Run: `flutter devices`
+4. Run: `flutter run`
+
+---
+
+## 📱 Supported Platforms
+
+| Platform | Status | Command |
+|----------|--------|---------|
+| Android | ✅ Supported | `flutter run -d android` |
+| iOS | ✅ Supported | `flutter run -d ios` |
+| Web | ✅ Supported | `flutter run -d chrome` |
+| Windows | ✅ Supported | `flutter run -d windows` |
+| macOS | ✅ Supported | `flutter run -d macos` |
+| Linux | ✅ Supported | `flutter run -d linux` |
+
+---
+
+## 🔐 Important Notes
+
+- **API Keys**: Never commit API keys to version control
+- **Secure Storage**: Sensitive data is stored securely using `flutter_secure_storage`
+- **Privacy**: The app doesn't collect personal data beyond login
+- **Internet Required**: Most features require an active internet connection
+
+---
+
+## 📚 Key Dependencies
+
+```yaml
+flutter: ^3.0.0
+provider: ^6.1.0                    # State management
+http: ^1.2.2                        # API requests
+flutter_secure_storage: ^9.2.2      # Secure storage
+webview_flutter: ^4.4.2             # Web content
+video_player: ^2.8.2                # Video playback
+url_launcher: ^6.2.1                # Open links
+shared_preferences: ^2.0.15         # Local storage
+```
+
+See `pubspec.yaml` for complete list.
+
+---
+
+## 🐛 Reporting Issues
+
+Found a bug? Please report it:
+1. Go to: https://github.com/Tahsan0619/babuntoo-academy/issues
+2. Click "New Issue"
+3. Describe the problem with steps to reproduce
+4. Include device info and Flutter version
+
+---
+
+## ✉️ Contact
+
+- **GitHub Repository**: https://github.com/Tahsan0619/babuntoo-academy
+- **Issues**: https://github.com/Tahsan0619/babuntoo-academy/issues
+- **Developer**: Tahsan
+
+---
+
+## 🎯 Features Overview
+
+✅ Interactive C Programming Tutorial  
+✅ Python Learning Path  
+✅ Hardware Component Details  
+✅ Software Catalog  
+✅ Scientists Timeline  
+✅ Latest Innovations  
+✅ Code Playground with AI  
+✅ Educational Games  
+✅ Programming Challenges  
+✅ Dark/Light Theme  
+✅ Responsive Design  
+
+---
+
+## 📊 App Highlights
+
+- **450+ Files** of educational content
+- **70,000+ Lines** of code
+- **Supports** Android, iOS, Web, Windows, macOS, Linux
+- **No Ads** - Fully educational focus
+- **Open Source** - Contribute and improve!
+
+---
+
+**Happy Learning! 🎓**
+
+Last Updated: December 8, 2025
