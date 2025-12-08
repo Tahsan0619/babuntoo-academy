@@ -1,0 +1,308 @@
+name: BabunToo_Academy
+description: A Flutter app for learning about PC hardware, software, programming, and scientists.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_secure_storage: ^9.2.2
+  http: ^1.2.2
+  url_launcher: ^6.2.1
+  package_info_plus: ^4.2.0
+  provider: ^6.1.0
+  webview_flutter: ^4.4.2
+  circular_menu: ^2.0.1
+  video_player: ^2.8.2
+  font_awesome_flutter: ^10.7.0            # optional: for extra icons
+  animated_text_kit: ^4.2.2                # optional: for typewriter/fancy text
+  flutter_screenutil: ^5.9.0
+  shared_preferences: ^2.0.15
+  advanced_chess_board: ^2.3.0
+  dartchess: ^0.11.1
+  sudoku_solver_generator: ^2.1.0+1
+  wp_chessboard: ^0.0.4
+  chess: ^0.8.1
+  flutter_code_view: ^0.0.2
+  flutter_flow_chart: ^2.2.1
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+  mockito: ^5.4.2
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"   # <-- Ensure this asset exists!
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/splash.mp4
+    - assets/icons/app_icon.png
+    # Hardware Images
+    - assets/images/hardware/icons/mouse.png
+    - assets/images/hardware/icons/keyboard.png
+    - assets/images/hardware/icons/monitor.png
+    - assets/images/hardware/icons/cpu.png
+    - assets/images/hardware/icons/motherboard.png
+    - assets/images/hardware/icons/ram.png
+    - assets/images/hardware/icons/hdd.png
+    - assets/images/hardware/icons/ssd.png
+    - assets/images/hardware/icons/gpu.png
+    - assets/images/hardware/icons/psu.png
+    - assets/images/hardware/icons/optical_drive.png
+    - assets/images/hardware/icons/sound_card.png
+    - assets/images/hardware/icons/nic.png
+    - assets/images/hardware/icons/wifi_adapter.png
+    - assets/images/hardware/icons/bluetooth_adapter.png
+    - assets/images/hardware/icons/ups.png
+    - assets/images/hardware/icons/printer.png
+    - assets/images/hardware/icons/scanner.png
+    - assets/images/hardware/icons/usb_flash_drive.png
+    - assets/images/hardware/icons/sd_card.png
+    - assets/images/hardware/icons/projector.png
+    - assets/images/hardware/icons/trackpad.png
+    - assets/images/hardware/icons/webcam.png
+    - assets/images/hardware/icons/microphone.png
+    - assets/images/hardware/icons/fan.png
+    - assets/images/hardware/icons/heatsink.png
+    - assets/images/hardware/icons/power_button.png
+    - assets/images/hardware/icons/joystick.png
+    - assets/images/hardware/icons/barcode_scanner.png
+    - assets/images/hardware/icons/external_hdd.png
+    - assets/images/hardware/icons/docking_station.png
+    - assets/images/hardware/icons/kvm_switch.png
+
+    # Scientist Images
+    - assets/images/scientists/newton.png
+    - assets/images/scientists/curie.png
+    - assets/images/scientists/einstein.png
+    - assets/images/scientists/darwin.png
+    - assets/images/scientists/tesla.png
+    - assets/images/scientists/galileo.png
+    - assets/images/scientists/hawking.png
+    - assets/images/scientists/franklin.png
+    - assets/images/scientists/feynman.png
+    - assets/images/scientists/lovelace.png
+    - assets/images/scientists/fleming.png
+    - assets/images/scientists/johnson.png
+    - assets/images/scientists/linnaeus.png
+    - assets/images/scientists/mendeleev.png
+    - assets/images/scientists/maxwell.png
+    - assets/images/scientists/bohr.png
+    - assets/images/scientists/pasteur.png
+    - assets/images/scientists/hopper.png
+    - assets/images/scientists/mcclintock.png
+    - assets/images/scientists/bose.png
+    - assets/images/scientists/schrodinger.png
+    - assets/images/scientists/planck.png
+    - assets/images/scientists/mendel.png
+    - assets/images/scientists/faraday.png
+    - assets/images/scientists/lavoisier.png
+    - assets/images/scientists/fermi.png
+    - assets/images/scientists/thomson.png
+    - assets/images/scientists/onnes.png
+    - assets/images/scientists/chandrasekhar.png
+    - assets/images/scientists/anning.png
+    - assets/images/scientists/bardeen.png
+    - assets/images/scientists/leavitt.png
+    - assets/images/scientists/joliotcurie.png
+    - assets/images/scientists/pascal.png
+    - assets/images/scientists/ampere.png
+    - assets/images/scientists/wu.png
+    - assets/images/scientists/goodall.png
+    - assets/images/scientists/carrier.png
+    - assets/images/scientists/carson.png
+    - assets/images/scientists/volta.png
+    - assets/images/scientists/bernerslee.png
+    - assets/images/scientists/lloyd.png
+    - assets/images/scientists/minkowski.png
+    - assets/images/scientists/vonneumann.png
+    - assets/images/scientists/noether.png
+    - assets/images/scientists/vanhelmont.png
+    - assets/images/scientists/cousteau.png
+    - assets/images/scientists/meitner.png
+    - assets/images/scientists/tu.png
+    - assets/images/scientists/hahn.png
+    - assets/images/scientists/herschel.png
+    - assets/images/scientists/cajal.png
+    - assets/images/scientists/davinci.png
+    - assets/images/scientists/oersted.png
+    - assets/images/scientists/harvey.png
+    - assets/images/scientists/ochoa.png
+
+    # Placeholder Image (used as fallback for missing assets)
+    - assets/images/placeholder.png
+    - assets/images/my_photo.jpg
+    - assets/images/Mufrid.jpg
+    - assets/images/Tanha.jpg
+    - assets/images/inventions/quantum_internet_1.jpg
+    - assets/images/inventions/quantum_internet_2.jpg
+    - assets/images/inventions/lab_meat_1.jpg
+    - assets/images/inventions/lab_meat_2.jpg
+    - assets/images/inventions/crispr_1.jpg
+    - assets/images/inventions/crispr_2.jpg
+    - assets/images/inventions/solid_state_battery_1.jpg
+    - assets/images/inventions/solid_state_battery_2.jpg
+    - assets/images/inventions/ai_diagnosis_1.jpg
+    - assets/images/inventions/ai_diagnosis_2.jpg
+    - assets/images/inventions/green_hydrogen_1.jpg
+    - assets/images/inventions/green_hydrogen_2.jpg
+    - assets/images/inventions/mrna_cancer_1.jpg
+    - assets/images/inventions/mrna_cancer_2.jpg
+    - assets/images/inventions/recyclable_blades_1.jpg
+    - assets/images/inventions/recyclable_blades_2.jpg
+    - assets/images/inventions/flexible_solar_1.jpg
+    - assets/images/inventions/flexible_solar_2.jpg
+    - assets/images/inventions/bci_1.jpg
+    - assets/images/inventions/bci_2.jpg
+    - assets/images/inventions/vertical_farm_1.jpg
+    - assets/images/inventions/vertical_farm_2.jpg
+    - assets/images/inventions/direct_air_capture_1.jpg
+    - assets/images/inventions/direct_air_capture_2.jpg
+    - assets/images/inventions/biodegradable_electronics_1.jpg
+    - assets/images/inventions/biodegradable_electronics_2.jpg
+    - assets/images/inventions/edible_water_pod_1.jpg
+    - assets/images/inventions/edible_water_pod_2.jpg
+    - assets/images/inventions/self_healing_concrete_1.jpg
+    - assets/images/inventions/self_healing_concrete_2.jpg
+    - assets/images/inventions/water_from_air_1.jpg
+    - assets/images/inventions/water_from_air_2.jpg
+    - assets/images/inventions/exoskeleton_1.jpg
+    - assets/images/inventions/exoskeleton_2.jpg
+    - assets/images/inventions/ar_contact_1.jpg
+    - assets/images/inventions/ar_contact_2.jpg
+    - assets/images/inventions/recyclable_clothes_1.jpg
+    - assets/images/inventions/recyclable_clothes_2.jpg
+    - assets/images/inventions/satellite_constellation_1.jpg
+    - assets/images/inventions/satellite_constellation_2.jpg
+    - assets/images/inventions/smart_glass_1.jpg
+    - assets/images/inventions/smart_glass_2.jpg
+    - assets/images/inventions/living_facade_1.jpg
+    - assets/images/inventions/living_facade_2.jpg
+    - assets/images/inventions/translation_earbuds_1.jpg
+    - assets/images/inventions/translation_earbuds_2.jpg
+    # Add all the images you’ll use like this:
+    # - assets/images/inventions/my_invention_1.jpg
+    # - assets/images/inventions/my_invention_2.jpg
+    - assets/images/software/windows_logo.png
+    - assets/images/software/visual_studio_code.png
+    - assets/images/software/google_chrome.png
+    - assets/images/software/mozilla_firefox.png
+    - assets/images/software/adobe_photoshop.png
+    - assets/images/software/microsoft_office.png
+    - assets/images/software/winrar.png
+    - assets/images/software/notepad_plus_plus.png
+    - assets/images/software/vlc_media_player.png
+    - assets/images/software/7zip.png
+    - assets/images/software/slack.png
+    - assets/images/software/discord.png
+    - assets/images/software/microsoft_teams.png
+    - assets/images/software/zoom.png
+    - assets/images/software/skype.png
+    - assets/images/software/audacity.png
+    - assets/images/software/gimp.png
+    - assets/images/software/blender.png
+    - assets/images/software/filezilla.png
+    - assets/images/software/git.png
+    - assets/images/software/sublime_text.png
+    - assets/images/software/pycharm.png
+    - assets/images/software/android_studio.png
+    - assets/images/software/xampp.png
+    - assets/images/software/obs_studio.png
+    - assets/images/software/spotify.png
+    - assets/images/software/dropbox.png
+    - assets/images/software/google_drive.png
+    - assets/images/software/adobe_acrobat_reader.png
+    - assets/images/software/paint_net.png
+    - assets/images/software/kmplayer.png
+    - assets/images/software/malwarebytes.png
+    - assets/images/software/qbittorrent.png
+    - assets/images/software/steam.png
+    - assets/images/software/libreoffice.png
+    - assets/images/software/teamviewer.png
+    - assets/images/software/recuva.png
+    - assets/images/software/ccleaner.png
+    - assets/images/software/figma.png
+    - assets/images/software/putty.png
+    - assets/images/software/mobaxterm.png
+    - assets/images/software/foxit_reader.png
+    - assets/images/software/keepass.png
+    - assets/images/software/whatsapp_desktop.png
+    - assets/images/software/adobe_xd.png
+    - assets/images/software/default.png  # Default fallback logo
+
+
+
+    - assets/images/hardware/mouse/mouse_logo.png
+    - assets/images/hardware/mouse/douglas_engelbart.png
+    - assets/images/hardware/mouse/mouse_wireless.png
+    - assets/images/hardware/mouse/mouse_gaming.png
+    - assets/images/hardware/mouse/mouse_body.png
+    - assets/images/hardware/mouse/mouse_buttons.png
+    - assets/images/hardware/mouse/mouse_sensor.png
+    - assets/images/hardware/mouse/mouse_wheel.png
+    - assets/images/hardware/mouse/mouse_flow_chart.png
+    - assets/images/hardware/mouse/mouse_battery.png
+    - assets/images/hardware/mouse/mouse_dpi_switch.png
+    - assets/images/hardware/mouse/mouse_ergonomic.png
+    - assets/images/hardware/mouse/mouse_travel.png
+    - assets/images/hardware/mouse/mouse_trackball.png
+    - assets/images/hardware/mouse/mouse_touch.png
+    - assets/images/hardware/mouse/mouse_side_buttons.png
+    - assets/images/hardware/mouse/mouse_vertical.png
+    - assets/images/hardware/mouse/mouse_wireless_module.png
+
+
+    - assets/images/hardware/cpu/cpu_logo.png
+    - assets/images/hardware/cpu/intel_logo.png
+    - assets/images/hardware/cpu/single_core_cpu.png
+    - assets/images/hardware/cpu/multi_core_cpu.png
+    - assets/images/hardware/cpu/mobile_cpu.png
+    - assets/images/hardware/cpu/server_cpu.png
+    - assets/images/hardware/cpu/alu.png
+    - assets/images/hardware/cpu/control_unit.png
+    - assets/images/hardware/cpu/cache.png
+    - assets/images/hardware/cpu/registers.png
+    - assets/images/hardware/cpu/bus_interface.png
+    - assets/images/hardware/cpu/cpu_flow.png
+
+
+    - assets/images/hardware/gpu/gpu_logo.png
+    - assets/images/hardware/gpu/nvidia_logo.png
+    - assets/images/hardware/gpu/integrated_gpu.png
+    - assets/images/hardware/gpu/discrete_gpu.png
+    - assets/images/hardware/gpu/workstation_gpu.png
+    - assets/images/hardware/gpu/gaming_gpu.png
+    - assets/images/hardware/gpu/gpu_cores.png
+    - assets/images/hardware/gpu/vram.png
+    - assets/images/hardware/gpu/cooling_fan.png
+    - assets/images/hardware/gpu/gpu_power.png
+    - assets/images/hardware/gpu/video_output.png
+    - assets/images/hardware/gpu/gpu_flow.png
+
+
+
+
+
+    
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+    - family: SourceCodePro
+      fonts:
+        - asset: assets/fonts/SourceCodePro-Regular.ttf
