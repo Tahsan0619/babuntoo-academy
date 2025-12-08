@@ -81,7 +81,7 @@ const List<TeamMember> teamMembers = [
   ),
 ];
 
-// ======= Team Section with Individual Education =======
+// ======= Team Section with Responsive Design =======
 class TeamSection extends StatelessWidget {
   const TeamSection({Key? key}) : super(key: key);
 
@@ -89,6 +89,7 @@ class TeamSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = AppColors.primary(context);
     final textColor = AppColors.mainText(context);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,10 +100,16 @@ class TeamSection extends StatelessWidget {
           style: AppTextStyles.headline(context).copyWith(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
-        ...teamMembers.map((member) => Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: _buildTeamCard(context, member, color, textColor),
-        )),
+        Wrap(
+          spacing: 20,
+          runSpacing: 20,
+          children: teamMembers.map((member) {
+            return SizedBox(
+              width: screenWidth < 600 ? screenWidth * 0.95 : (screenWidth / 2) - 30,
+              child: _buildTeamCard(context, member, color, textColor),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
@@ -146,13 +153,16 @@ class TeamSection extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              member.name,
-                              style: AppTextStyles.headline(context).copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: color,
-                                decoration: TextDecoration.underline,
+                            Flexible(
+                              child: Text(
+                                member.name,
+                                style: AppTextStyles.headline(context).copyWith(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: color,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -174,6 +184,7 @@ class TeamSection extends StatelessWidget {
                             color: color,
                             fontWeight: FontWeight.w700,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -183,12 +194,12 @@ class TeamSection extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Contact Row
-            Row(
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
               children: [
                 _buildContactTile(context, Icons.phone, member.phone, () => _launchUrl(context, 'tel:${member.phone}')),
-                const SizedBox(width: 12),
                 _buildContactTile(context, Icons.email, member.email, () => _launchUrl(context, 'mailto:${member.email}')),
-                const SizedBox(width: 12),
                 _buildContactTile(context, Icons.chat, 'WhatsApp', () => _launchUrl(context, 'https://wa.me/${member.whatsapp.replaceAll('+', '')}')),
               ],
             ),
@@ -223,11 +234,13 @@ class TeamSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          edu.value,
-                          style: AppTextStyles.body(context).copyWith(
-                            fontSize: 14,
-                            color: textColor.withOpacity(0.85),
+                        Flexible(
+                          child: Text(
+                            edu.value,
+                            style: AppTextStyles.body(context).copyWith(
+                              fontSize: 14,
+                              color: textColor.withOpacity(0.85),
+                            ),
                           ),
                         ),
                       ],
@@ -244,7 +257,8 @@ class TeamSection extends StatelessWidget {
 
   Widget _buildContactTile(BuildContext context, IconData icon, String text, VoidCallback onTap) {
     final color = AppColors.primary(context);
-    return Expanded(
+    return SizedBox(
+      width: 120,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -287,16 +301,12 @@ class TeamSection extends StatelessWidget {
   }
 }
 
-// ======= Contact Us Page (Team + Individual Education) ===========
+// ======= Contact Us Page (100% Responsive - FIXED) ===========
 class ContactUsPage extends StatelessWidget {
   const ContactUsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double screenW = MediaQuery.of(context).size.width;
-    double cardW = screenW < 540 ? screenW : screenW < 900 ? 520 : 700;
-    final sectionSpace = screenW < 500 ? 14.0 : 26.0;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Contact Us', style: AppTextStyles.appBar(context)),
@@ -306,24 +316,38 @@ class ContactUsPage extends StatelessWidget {
         iconTheme: IconThemeData(color: AppColors.primary(context)),
       ),
       backgroundColor: AppColors.background(context),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          padding: AppConstants.pagePadding.copyWith(top: 32, bottom: 32),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: cardW),
-            child: Card(
-              color: AppColors.background(context),
-              elevation: 8,
-              shadowColor: AppColors.cardShadow(context).withOpacity(0.15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: TeamSection(),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenW = constraints.maxWidth;
+          final maxWidth = screenW < 540
+              ? screenW * 0.95
+              : screenW < 900
+              ? 520.0
+              : 700.0;
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenW < 500 ? 16.0 : 32.0,
+              vertical: screenW < 500 ? 24.0 : 32.0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Card(
+                color: AppColors.background(context),
+                elevation: 8,
+                shadowColor: AppColors.cardShadow(context).withOpacity(0.15),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenW < 500 ? 20.0 : 24.0,
+                    vertical: screenW < 500 ? 24.0 : 32.0,
+                  ),
+                  child: const TeamSection(),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
