@@ -44,17 +44,35 @@ flutter pub get
 
 This command downloads all required packages listed in `pubspec.yaml`.
 
-### Step 3: Configure API Keys (Optional)
+### Step 3: Configure API Keys (Required for Code Playground)
 
-If you want to use the Code Playground feature:
+The Code Playground feature requires a Groq API key to execute and explain code snippets. 
 
-1. Open `lib/code_playground_screen.dart`
-2. Find line 9:
+**⚠️ IMPORTANT - API Key Policy:**
+
+For security and ethical reasons, **API keys should never be shared or hardcoded in public repositories**. If you want to use the Code Playground feature:
+
+**Option A: Get Your Own API Key**
+1. Sign up for Groq API at: https://console.groq.com
+2. Generate your own API key
+3. Open `lib/code_playground_screen.dart`
+4. Find line 9:
    ```dart
    const _groqKeyStorageKey = 'YOUR_GROQ_API_KEY_HERE';
    ```
-3. Replace `YOUR_GROQ_API_KEY_HERE` with your actual Groq API key
-4. Or the app will prompt you to enter it on first launch
+5. Replace `YOUR_GROQ_API_KEY_HERE` with your own Groq API key
+6. The app will securely store it on first launch
+
+**Option B: Request API Key from Developer**
+If you're unable to obtain your own API key or prefer to request one:
+- **Contact**: tahsan@example.com
+- **GitHub Issues**: https://github.com/Tahsan0619/babuntoo-academy/issues
+- Explain your use case and I can provide guidance
+
+**Security Note**: 
+- Never commit API keys to version control
+- API keys are stored securely using `flutter_secure_storage`
+- Each user should use their own API key for production use
 
 ### Step 4: Run the App
 
@@ -306,8 +324,9 @@ Found a bug? Please report it:
 ## ✉️ Contact
 
 - **GitHub Repository**: https://github.com/Tahsan0619/babuntoo-academy
-- **Issues**: https://github.com/Tahsan0619/babuntoo-academy/issues
-- **Developer**: Tahsan
+- **Issues & Support**: https://github.com/Tahsan0619/babuntoo-academy/issues
+- **Developer Email**: tahsan@example.com
+- **API Key Support**: Contact the developer if you need guidance on obtaining your own Groq API key
 
 ---
 
