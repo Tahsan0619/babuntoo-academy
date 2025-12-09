@@ -30,16 +30,20 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/sendSMS'),
+        Uri.parse('$baseUrl/sms/send'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'address': phoneNumber,
-          'singleMessageBody': message,
-          'senderAddress': msisdn ?? 'AppLink',
-          'appId': appId,
+          'version': '1.0',
+          'applicationId': appId,
+          'password': apiKey,
+          'message': message,
+          'destinationAddresses': [
+            phoneNumber.startsWith('tel:') ? phoneNumber : 'tel:$phoneNumber'
+          ],
+          'sourceAddress': msisdn ?? '77000',
+          'deliveryStatusRequest': '1',
         }),
       );
 
@@ -79,13 +83,17 @@ class ApplinkApiService {
   static Future<Map<String, dynamic>> receiveSMS() async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/receiveSMS'),
+        Uri.parse('$baseUrl/sms/receive'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'appId': appId,
+          'version': '1.0',
+          'applicationId': appId,
+          'sourceAddress': 'tel:+8801234567890', // Placeholder
+          'message': '',
+          'requestId': 'APP_REQUEST',
+          'encoding': '0',
         }),
       );
 
@@ -126,14 +134,15 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/getSMSReport'),
+        Uri.parse('$baseUrl/sms/report'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'messageId': messageId,
-          'appId': appId,
+          'destinationAddress': 'tel:+8801234567890',
+          'timeStamp': '20240101000000',
+          'requestId': messageId,
+          'deliveryStatus': 'DELIVERED',
         }),
       );
 
@@ -180,17 +189,15 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/userSubscription'),
+        Uri.parse('$baseUrl/subscription/send'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'msisdn': msisdn,
-          'serviceType': subscriptionType,
-          'action': action, // 'subscribe' or 'unsubscribe'
-          'shortCode': shortCode,
-          'appId': appId,
+          'applicationId': appId,
+          'password': apiKey,
+          'subscriberId': msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn',
+          'action': action == 'subscribe' ? '1' : '0', // 1 for subscribe, 0 for unsubscribe
         }),
       );
 
@@ -231,11 +238,14 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/getBaseSize'),
+        Uri.parse('$baseUrl/subscription/query-base'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
+        body: jsonEncode({
+          'applicationId': appId,
+          'password': apiKey,
+        }),
         body: jsonEncode({
           'shortCode': shortCode,
           'serviceType': subscriptionType,
@@ -280,15 +290,16 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/getSubscriberChargingInfo'),
+        Uri.parse('$baseUrl/subscription/getSubscriberChargingInfo'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'msisdn': msisdn,
-          'shortCode': shortCode,
-          'appId': appId,
+          'applicationId': appId,
+          'password': apiKey,
+          'subscriberIds': [
+            msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn'
+          ],
         }),
       );
 
@@ -331,16 +342,18 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/sendNotification'),
+        Uri.parse('$baseUrl/subscription/notify'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'msisdn': msisdn,
+          'version': '1.0',
+          'applicationId': appId,
+          'password': apiKey,
+          'subscriberId': msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn',
           'message': message,
-          'shortCode': shortCode,
-          'appId': appId,
+          'frequency': 'daily',
+          'status': 'REGISTERED',
         }),
       );
 
@@ -382,17 +395,20 @@ class ApplinkApiService {
     required String shortCode,
   }) async {
     try {
+      // Ensure msisdn is in correct format
+      final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
+      
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/requestOTP'),
+        Uri.parse('$baseUrl/otp/request'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'msisdn': msisdn,
-          'shortCode': shortCode,
-          'appId': appId,
+          'applicationId': appId,
+          'password': apiKey,
+          'subscriberId': subscriberId,
         }),
+      );
       );
 
       if (response.statusCode == 200) {
@@ -433,17 +449,20 @@ class ApplinkApiService {
     required String shortCode,
   }) async {
     try {
+      // Ensure msisdn is in correct format
+      final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
+      
       final response = await http.post(
-        Uri.parse('$baseUrl/tap/verifyOTP'),
+        Uri.parse('$baseUrl/otp/verify'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          'msisdn': msisdn,
+          'applicationId': appId,
+          'password': apiKey,
+          'referenceNo': otpCode, // Will be replaced with actual reference in practice
           'otp': otpCode,
-          'shortCode': shortCode,
-          'appId': appId,
+          'sourceAddress': subscriberId,
         }),
       );
 
