@@ -246,11 +246,6 @@ class ApplinkApiService {
           'applicationId': appId,
           'password': apiKey,
         }),
-        body: jsonEncode({
-          'shortCode': shortCode,
-          'serviceType': subscriptionType,
-          'appId': appId,
-        }),
       );
 
       if (response.statusCode == 200) {
@@ -408,7 +403,6 @@ class ApplinkApiService {
           'password': apiKey,
           'subscriberId': subscriberId,
         }),
-      );
       );
 
       if (response.statusCode == 200) {
