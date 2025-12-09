@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import '../services/applink_api_service.dart';
-import '../utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPageWithAPI extends StatefulWidget {
-  const LoginPageWithAPI({Key? key}) : super(key: key);
+class SignupPageWithAPI extends StatefulWidget {
+  const SignupPageWithAPI({Key? key}) : super(key: key);
 
   @override
-  State<LoginPageWithAPI> createState() => _LoginPageWithAPIState();
+  State<SignupPageWithAPI> createState() => _SignupPageWithAPIState();
 }
 
-class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
+class _SignupPageWithAPIState extends State<SignupPageWithAPI> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
-  
+  final TextEditingController nameController = TextEditingController();
+
   bool isOTPSent = false;
   bool isLoading = false;
+  bool wantSubscription = true;
   String? errorMessage;
   String? successMessage;
   bool useTestMode = false; // Set to false to use real API
@@ -24,6 +25,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
   void dispose() {
     phoneController.dispose();
     otpController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -46,8 +48,8 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
     });
 
     try {
-      final phone = phoneController.text.startsWith('+88') 
-          ? phoneController.text 
+      final phone = phoneController.text.startsWith('+88')
+          ? phoneController.text
           : '+88${phoneController.text}';
 
       final response = useTestMode
@@ -75,9 +77,14 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
     }
   }
 
-  Future<void> verifyOTPAndLogin() async {
+  Future<void> verifyOTPAndSignup() async {
     if (otpController.text.isEmpty) {
       setState(() => errorMessage = 'Please enter OTP');
+      return;
+    }
+
+    if (nameController.text.isEmpty) {
+      setState(() => errorMessage = 'Please enter your name');
       return;
     }
 
@@ -88,11 +95,12 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
     });
 
     try {
-      final phone = phoneController.text.startsWith('+88') 
-          ? phoneController.text 
+      final phone = phoneController.text.startsWith('+88')
+          ? phoneController.text
           : '+88${phoneController.text}';
 
-      final response = useTestMode
+      // First verify OTP
+      final verifyResponse = useTestMode
           ? await ApplinkApiService.testVerifyOTP(
               msisdn: phone,
               otpCode: otpController.text,
@@ -103,22 +111,46 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
               shortCode: ApplinkApiService.defaultShortCode,
             );
 
-      if (response['success']) {
-        // Save phone number and token to local storage
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('userPhone', phone);
-        await prefs.setString('userToken', response['data']['token'] ?? '');
-        await prefs.setBool('isLoggedIn', true);
+      if (!verifyResponse['success']) {
+        setState(() => errorMessage = verifyResponse['message'] ?? 'Invalid OTP');
+        setState(() => isLoading = false);
+        return;
+      }
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login successful!')),
-          );
-          // Navigate to home page
-          Navigator.of(context).pushReplacementNamed('/home');
+      // If subscription is enabled, process subscription
+      if (wantSubscription) {
+        final subResponse = useTestMode
+            ? await ApplinkApiService.testSubscription(
+                msisdn: phone,
+                action: 'subscribe',
+              )
+            : await ApplinkApiService.userSubscription(
+                msisdn: phone,
+                subscriptionType: 'DAILY',
+                action: 'subscribe',
+                shortCode: ApplinkApiService.defaultShortCode,
+              );
+
+        if (!subResponse['success']) {
+          setState(() => errorMessage =
+              subResponse['error'] ?? 'Subscription failed, but account created');
         }
-      } else {
-        setState(() => errorMessage = response['message'] ?? 'Invalid OTP');
+      }
+
+      // Save user data to local storage
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userName', nameController.text);
+      await prefs.setString('userPhone', phone);
+      await prefs.setString('userToken', verifyResponse['data']['token'] ?? '');
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setBool('userSubscribed', wantSubscription);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully!')),
+        );
+        // Navigate to home page
+        Navigator.of(context).pushReplacementNamed('/home');
       }
     } catch (e) {
       setState(() => errorMessage = 'Error: $e');
@@ -131,7 +163,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Sign Up'),
         centerTitle: true,
         elevation: 0,
       ),
@@ -153,7 +185,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Secure OTP-Based Login',
+              'Create Your Account',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
@@ -193,6 +225,23 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
             ),
             const SizedBox(height: 30),
 
+            // Full Name Input
+            if (!isOTPSent) ...[
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  hintText: 'Enter your full name',
+                  prefixIcon: const Icon(Icons.person),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                enabled: !isLoading,
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // Phone Number Input
             TextField(
               controller: phoneController,
@@ -226,6 +275,20 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
                   counterText: '',
                 ),
                 enabled: !isLoading,
+              ),
+              const SizedBox(height: 16),
+
+              // Subscription Toggle
+              Card(
+                child: CheckboxListTile(
+                  title: const Text('Subscribe to Daily Updates'),
+                  subtitle: const Text('Get daily challenges and learning materials'),
+                  value: wantSubscription,
+                  onChanged: isLoading ? null : (value) {
+                    setState(() => wantSubscription = value ?? true);
+                  },
+                  activeColor: Colors.blue,
+                ),
               ),
               const SizedBox(height: 16),
             ],
@@ -280,7 +343,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
 
             // Main Action Button
             ElevatedButton(
-              onPressed: isLoading ? null : (isOTPSent ? verifyOTPAndLogin : requestOTP),
+              onPressed: isLoading ? null : (isOTPSent ? verifyOTPAndSignup : requestOTP),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: Colors.blue,
@@ -296,7 +359,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
                       ),
                     )
                   : Text(
-                      isOTPSent ? 'Verify & Login' : 'Send OTP',
+                      isOTPSent ? 'Create Account' : 'Send OTP',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -335,15 +398,15 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
 
             const SizedBox(height: 24),
 
-            // Sign Up Link
+            // Login Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Don\'t have an account? '),
+                const Text('Already have an account? '),
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/signup'),
+                  onTap: () => Navigator.pop(context),
                   child: const Text(
-                    'Sign Up',
+                    'Login',
                     style: TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
@@ -358,4 +421,3 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
     );
   }
 }
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 import '../utils/theme_provider.dart';
 
@@ -19,6 +20,7 @@ import '../hardware_detail/hardware_menu_page.dart';
 import '../education_models_list_page.dart';
 import 'code_playground_screen.dart';
 import 'education/features/models/models_list_page.dart';
+import 'login_page_with_api.dart';
 
 class MenuOption {
   final IconData icon;
@@ -157,6 +159,76 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _showUserProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userName = prefs.getString('userName') ?? 'Guest User';
+    final userPhone = prefs.getString('userPhone') ?? 'Not available';
+    final isSubscribed = prefs.getBool('userSubscribed') ?? false;
+
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('User Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.blue,
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Name: $userName',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Phone: $userPhone',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Text('Subscription: '),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isSubscribed ? Colors.green : Colors.orange,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      isSubscribed ? 'Active' : 'Inactive',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   final List<MenuOption> options = [
     MenuOption(Icons.memory, "PC Hardware", "", HardwareMenuPage()),
     MenuOption(Icons.desktop_windows, "PC Software", "", SoftwarePage()),
@@ -219,6 +291,42 @@ class _HomePageState extends State<HomePage> {
                     tooltip:
                         isDark ? "Switch to Light Mode" : "Switch to Dark Mode",
                     onPressed: themeProvider.toggleTheme,
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      if (value == 'logout') {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.clear();
+                        if (mounted) {
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        }
+                      } else if (value == 'profile') {
+                        _showUserProfile();
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'profile',
+                        child: Row(
+                          children: [
+                            Icon(Icons.person, size: 20),
+                            SizedBox(width: 8),
+                            Text('Profile'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, size: 20, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('Logout', style: TextStyle(color: Colors.red)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );

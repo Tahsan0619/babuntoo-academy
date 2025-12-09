@@ -6,6 +6,8 @@ import '../utils/constants.dart';
 
 import 'login_page.dart';
 import 'signup_page.dart';
+import 'signup_page_with_api.dart';
+import 'login_page_with_api.dart';
 import 'home_page.dart';
 import 'splash_screen.dart';
 import 'latest_inventions_page.dart';
@@ -69,8 +71,8 @@ class BabuntooApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           initialRoute: '/splash',
           routes: {
-            '/login': (context) => LoginPage(),
-            '/signup': (context) => SignupPage(),
+            '/login': (context) => const LoginPageWithAPI(),
+            '/signup': (context) => const SignupPageWithAPI(),
             '/home': (context) => HomePage(),
             '/splash': (context) => const SplashScreen(),
             '/latestInventions': (context) => const LatestInventionsPage(),
@@ -94,3 +96,4 @@ class BabuntooApp extends StatelessWidget {
     );
   }
 }
+

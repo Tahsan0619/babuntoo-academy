@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 /// Applink API Service for SMS and Subscription integration
 /// Based on OpenAPI specification provided
 class ApplinkApiService {
-  static const String baseUrl = 'https://api.applink.com'; // Replace with actual API URL
+  // API Configuration - Update with your credentials from Applink
+  static const String baseUrl = 'https://applink.com.bd'; // Applink API endpoint
+  static const String apiKey = 'YOUR_API_KEY'; // Replace with actual API key from Applink
+  static const String appId = '12345'; // Replace with your App ID from Applink
   
-  // API Keys and credentials (should be stored securely)
-  static const String apiKey = 'YOUR_API_KEY'; // Replace with actual API key
-  static const String appId = 'YOUR_APP_ID'; // Replace with actual App ID
+  // Default short code for SMS/Subscription services
+  static const String defaultShortCode = '1234'; // Replace with your short code
   
   // ==================== SMS SERVICES ====================
   

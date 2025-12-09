@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/theme_provider.dart';
-import 'login_page.dart';
+import 'login_page_with_api.dart';
+import 'home_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -35,13 +37,40 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _controller.forward();
 
     Future.delayed(const Duration(milliseconds: 1450), () {
+      _checkAuthStatus();
+    });
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      final userPhone = prefs.getString('userPhone');
+
       if (mounted) {
+        if (isLoggedIn && userPhone != null) {
+          // User is logged in, go to home
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
+        } else {
+          // User not logged in, go to login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginPageWithAPI()),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        // On error, go to login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
+          MaterialPageRoute(builder: (_) => const LoginPageWithAPI()),
         );
       }
-    });
+    }
   }
 
   @override
