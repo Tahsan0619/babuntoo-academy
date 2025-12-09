@@ -393,17 +393,31 @@ class ApplinkApiService {
       // Ensure msisdn is in correct format
       final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
       
+      final url = '$baseUrl/otp/request';
+      final body = {
+        'applicationId': appId,
+        'password': apiKey,
+        'subscriberId': subscriberId,
+      };
+      
+      if (kDebugMode) {
+        print('=== OTP REQUEST ===');
+        print('URL: $url');
+        print('Body: ${jsonEncode(body)}');
+      }
+      
       final response = await http.post(
-        Uri.parse('$baseUrl/otp/request'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
         },
-        body: jsonEncode({
-          'applicationId': appId,
-          'password': apiKey,
-          'subscriberId': subscriberId,
-        }),
-      );
+        body: jsonEncode(body),
+      ).timeout(const Duration(seconds: 30));
+
+      if (kDebugMode) {
+        print('Status Code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -415,16 +429,18 @@ class ApplinkApiService {
       } else {
         return {
           'success': false,
-          'error': 'Failed to request OTP: ${response.statusCode}',
+          'error': 'Failed to request OTP: ${response.statusCode} - ${response.body}',
         };
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error requesting OTP: $e');
+        print('=== OTP REQUEST ERROR ===');
+        print('Error: $e');
+        print('Error type: ${e.runtimeType}');
       }
       return {
         'success': false,
-        'error': 'Error requesting OTP: $e',
+        'error': 'Network Error: $e\n\nMake sure:\n1. Your internet is working\n2. API Key is correct\n3. App ID is correct',
       };
     }
   }
@@ -446,19 +462,33 @@ class ApplinkApiService {
       // Ensure msisdn is in correct format
       final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
       
+      final url = '$baseUrl/otp/verify';
+      final body = {
+        'applicationId': appId,
+        'password': apiKey,
+        'referenceNo': otpCode,
+        'otp': otpCode,
+        'sourceAddress': subscriberId,
+      };
+      
+      if (kDebugMode) {
+        print('=== OTP VERIFY ===');
+        print('URL: $url');
+        print('Body: ${jsonEncode(body)}');
+      }
+      
       final response = await http.post(
-        Uri.parse('$baseUrl/otp/verify'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
         },
-        body: jsonEncode({
-          'applicationId': appId,
-          'password': apiKey,
-          'referenceNo': otpCode, // Will be replaced with actual reference in practice
-          'otp': otpCode,
-          'sourceAddress': subscriberId,
-        }),
-      );
+        body: jsonEncode(body),
+      ).timeout(const Duration(seconds: 30));
+
+      if (kDebugMode) {
+        print('Status Code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -470,16 +500,18 @@ class ApplinkApiService {
       } else {
         return {
           'success': false,
-          'error': 'Failed to verify OTP: ${response.statusCode}',
+          'error': 'OTP verification failed: ${response.statusCode} - ${response.body}',
         };
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error verifying OTP: $e');
+        print('=== OTP VERIFY ERROR ===');
+        print('Error: $e');
+        print('Error type: ${e.runtimeType}');
       }
       return {
         'success': false,
-        'error': 'Error verifying OTP: $e',
+        'error': 'Network Error: $e',
       };
     }
   }
