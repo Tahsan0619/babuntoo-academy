@@ -7,11 +7,11 @@ import 'package:flutter/foundation.dart';
 class ApplinkApiService {
   // API Configuration - Update with your credentials from Applink
   static const String baseUrl = 'https://applink.com.bd'; // Applink API endpoint
-  static const String apiKey = 'YOUR_API_KEY'; // Replace with actual API key from Applink
-  static const String appId = '12345'; // Replace with your App ID from Applink
+  static const String apiKey = '19f0d73f45da48d6d4e02bb30cca4362'; // Replace with actual API key from Applink
+  static const String appId = 'APP_018675'; // Replace with your App ID from Applink
   
   // Default short code for SMS/Subscription services
-  static const String defaultShortCode = '1234'; // Replace with your short code
+  static const String defaultShortCode = '21213'; // Replace with your short code
   
   // ==================== SMS SERVICES ====================
   
@@ -30,7 +30,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/send'),
+        Uri.parse('$baseUrl/tap/sendSMS'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -79,7 +79,7 @@ class ApplinkApiService {
   static Future<Map<String, dynamic>> receiveSMS() async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/receive'),
+        Uri.parse('$baseUrl/tap/receiveSMS'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -126,7 +126,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/report'),
+        Uri.parse('$baseUrl/tap/getSMSReport'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -180,7 +180,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/send'),
+        Uri.parse('$baseUrl/tap/userSubscription'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -231,7 +231,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/query-base'),
+        Uri.parse('$baseUrl/tap/getBaseSize'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -280,7 +280,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/getSubscriberChargingInfo'),
+        Uri.parse('$baseUrl/tap/getSubscriberChargingInfo'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -331,7 +331,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/notify'),
+        Uri.parse('$baseUrl/tap/sendNotification'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -383,7 +383,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/otp/request'),
+        Uri.parse('$baseUrl/tap/requestOTP'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -434,7 +434,7 @@ class ApplinkApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/otp/verify'),
+        Uri.parse('$baseUrl/tap/verifyOTP'),
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
           'Authorization': 'Bearer $apiKey',
