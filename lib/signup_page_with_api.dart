@@ -62,9 +62,9 @@ class _SignupPageWithAPIState extends State<SignupPageWithAPI> {
       if (response['success']) {
         setState(() {
           isOTPSent = true;
-          successMessage = response['message'];
+          successMessage = response['message'] ?? 'OTP sent successfully';
           if (useTestMode && response['data'] != null) {
-            successMessage += '\n\n🧪 Test OTP: ${response['data']['testOTP']}';
+            successMessage = (successMessage ?? '') + '\n\n🧪 Test OTP: ${response['data']['testOTP']}';
           }
         });
       } else {
