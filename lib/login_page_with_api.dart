@@ -48,6 +48,24 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
+      
+      // Check default admin login
+      if (email == 'admin@gmail.com' && password == 'admin000') {
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userToken', 'ADMIN_TOKEN');
+        await prefs.setString('userName', 'Admin');
+        await prefs.setString('userEmail', 'admin@gmail.com');
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Welcome Admin!')),
+        );
+        Navigator.of(context).pushReplacementNamed('/home');
+        return;
+      }
+      
+      // Check saved user credentials
       final savedEmail = prefs.getString('userEmail');
       final savedPassword = prefs.getString('userPassword');
 
