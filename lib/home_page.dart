@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/constants.dart';
-import '../utils/theme_provider.dart';
 
-import 'latest_inventions_page.dart';
-import 'hardware_page.dart';
-import 'software_page.dart';
-import 'scientists_timeline_page.dart';
-import 'programming_languages_page.dart';
-import 'learn_programming_menu_page.dart';
-import 'contact_us_page.dart';
 import '../challenge/challenge_page.dart';
-import '../playground/playground_page.dart';
-import '../interactive learning/interactive_learning_menu_page.dart';
+import '../education_models_list_page.dart';
 import '../games/games_menu_page.dart';
 import '../hardware_detail/hardware_menu_page.dart';
-import '../education_models_list_page.dart';
+import '../interactive learning/interactive_learning_menu_page.dart';
+import '../playground/playground_page.dart';
+import '../utils/constants.dart';
+import '../utils/theme_provider.dart';
 import 'code_playground_screen.dart';
+import 'contact_us_page.dart';
 import 'education/features/models/models_list_page.dart';
+import 'latest_inventions_page.dart';
 import 'login_page_with_api.dart';
+import 'programming_languages_page.dart';
+import 'scientists_timeline_page.dart';
+import 'software_page.dart';
+import 'hardware_page.dart';
+import 'learn_programming_menu_page.dart';
 
 class MenuOption {
   final IconData icon;
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('App Version: 1.08 (Build 1.08${info.buildNumber})'),
+              Text('App Version: 1.09 (Build 1.09${info.buildNumber})'),
               const SizedBox(height: 12),
               const Text(
                 "What is present:(1.01)",
@@ -162,6 +162,17 @@ class _HomePageState extends State<HomePage> {
               const Text("• Simplified subscription system (Free Plan)"),
               const Text("• Removed legacy API dependencies"),
               const Text("• All games production ready & fully playable"),
+              const Text(
+                "What is new:(1.09)",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text("• Challenge MCQs redesigned with scoring modes"),
+              const Text("• Timed Bonus mode with visible countdown"),
+              const Text("• Per-language and global scoring mode selector"),
+              const Text("• Dedicated model pages with responsive rich content"),
+              const Text("• Faster image loading via precaching"),
+              const Text("• UI polish: more responsive grids, overflow-safe layouts"),
             ],
           ),
         ),
@@ -437,7 +448,6 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
-            // Centralized Contact Me button
             Padding(
               padding: const EdgeInsets.only(top: 18.0, bottom: 12.0),
               child: Center(

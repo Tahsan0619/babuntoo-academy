@@ -216,4 +216,28 @@ Found a bug? Please report it:
 
 **Happy Learning! 🎓**
 
-Last Updated: December 8, 2025
+Last Updated: December 12, 2025
+
+---
+
+## 🆕 Version 1.09 Highlights
+
+- Challenge MCQs redesigned with scoring modes (Standard, Timed Bonus)
+- Timed Bonus includes a 10s visible countdown per question
+- Per-language scoring mode selector + global default toggle
+- Dedicated education model pages with rich, responsive content
+- Faster header image loading via precaching on navigation
+- Additional UI polish: overflow-safe sections, improved grids
+
+### Upgrading from 1.08 → 1.09
+
+No breaking changes. Features added:
+- Scoring mode enum and UI toggles
+- Quiz page fractional scoring and summary updates
+- Model detail pages enhanced with images, tips, and references
+
+To run:
+```bash
+flutter pub get
+flutter run
+```
