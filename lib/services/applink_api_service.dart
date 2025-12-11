@@ -1,609 +1,478 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
-/// Applink API Service for SMS and Subscription integration
-/// Based on OpenAPI specification provided
+/// Applink API Service for SMS and Subscription integration only.
 class ApplinkApiService {
-  // API Configuration - Update with your credentials from Applink
-  static const String baseUrl = 'https://applink.com.bd'; // Applink API endpoint
-  static const String apiKey = '19f0d73f45da48d6d4e02bb30cca4362'; // Replace with actual API key from Applink
-  static const String appId = 'APP_018675'; // Replace with your App ID from Applink
-  
-  // Default short code for SMS/Subscription services
-  static const String defaultShortCode = '21213'; // Replace with your short code
-  
-  // ==================== SMS SERVICES ====================
-  
-  /// Send SMS to a phone number
-  /// 
-  /// Parameters:
-  /// - [phoneNumber]: Recipient phone number
-  /// - [message]: SMS message content
-  /// - [msisdn]: Sender MSISDN (optional)
-  /// 
-  /// Returns: SMS send response with message ID
+  // ================== CONFIG ==================
+
+  /// Applink base URL
+  static const String _baseUrl = 'https://api.applink.com.bd/';
+
+  /// Your App ID from Applink dashboard
+  static const String appId = 'APP_018675'; // TODO: replace with your real App ID
+
+  /// Your API key from Applink dashboard
+  static const String apiKey = '19f0d73f45da48d6d4e02bb30cca4362'; // TODO: replace with your real key
+
+  /// Default API version
+  static const String _defaultVersion = '1.0';
+
+  /// Common headers
+  static const Map<String, String> _headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+  };
+
+  // ================== INTERNAL HELPERS ==================
+
+  static Uri _buildUri(String path) {
+    // Ensure no duplicate slashes
+    return Uri.parse('$_baseUrl$path');
+  }
+
+  static Map<String, dynamic> _successResponse(
+      dynamic data, {
+        String message = 'OK',
+      }) {
+    return {
+      'success': true,
+      'data': data,
+      'message': message,
+    };
+  }
+
+  static Map<String, dynamic> _errorResponse(
+      String error, {
+        int? statusCode,
+        dynamic raw,
+      }) {
+    return {
+      'success': false,
+      'error': error,
+      'statusCode': statusCode,
+      'raw': raw,
+    };
+  }
+
+  static void _debugLog(String label, dynamic value) {
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('[$label] $value');
+    }
+  }
+
+  static String _ensureTel(String msisdn) {
+    return msisdn.startsWith('tel') ? msisdn : 'tel$msisdn';
+  }
+
+  /// Format timestamp as yyMMddHHmm for subscription notify if needed externally.
+  static String formatTimestamp(DateTime dt) {
+    final year = dt.year % 100;
+    final month = dt.month.toString().padLeft(2, '0');
+    final day = dt.day.toString().padLeft(2, '0');
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '${year.toString().padLeft(2, '0')}$month$day$hour$minute';
+  }
+
+  // =====================================================
+  //                     SMS SERVICES
+  // =====================================================
+
+  /// Send SMS to one or more destination numbers.
+  ///
+  /// Per docs:
+  /// - endpoint: POST smssend
+  /// - required: version, applicationId, password, message, destinationAddresses[]
+  /// - optional: sourceAddress, deliveryStatusRequest, encoding, binaryHeader
   static Future<Map<String, dynamic>> sendSMS({
-    required String phoneNumber,
+    required List<String> phoneNumbers,
     required String message,
-    String? msisdn,
+    String sourceAddress = '77000',
+    String version = _defaultVersion,
+    String deliveryStatusRequest = '1', // "0" or "1"
+    String? encoding, // "0", "240", "245"
+    String? binaryHeader,
   }) async {
     try {
+      final url = _buildUri('smssend');
+
+      final destinationAddresses =
+      phoneNumbers.map((p) => _ensureTel(p)).toList();
+
+      final Map<String, dynamic> body = {
+        'version': version,
+        'applicationId': appId,
+        'password': apiKey,
+        'message': message,
+        'destinationAddresses': destinationAddresses,
+        'sourceAddress': sourceAddress,
+        'deliveryStatusRequest': deliveryStatusRequest,
+      };
+
+      if (encoding != null && encoding.isNotEmpty) {
+        body['encoding'] = encoding;
+      }
+      if (binaryHeader != null && binaryHeader.isNotEmpty) {
+        body['binaryHeader'] = binaryHeader;
+      }
+
+      _debugLog('SMS SEND URL', url.toString());
+      _debugLog('SMS SEND BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/send'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'version': '1.0',
-          'applicationId': appId,
-          'password': apiKey,
-          'message': message,
-          'destinationAddresses': [
-            phoneNumber.startsWith('tel:') ? phoneNumber : 'tel:$phoneNumber'
-          ],
-          'sourceAddress': msisdn ?? '77000',
-          'deliveryStatusRequest': '1',
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog('SMS SEND STATUS', response.statusCode);
+      _debugLog('SMS SEND RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (kDebugMode) {
-          print('SMS sent successfully: $data');
-        }
-        return {
-          'success': true,
-          'data': data,
-          'message': 'SMS sent successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to send SMS: ${response.statusCode}',
-          'statusCode': response.statusCode,
-        };
+        return _successResponse(
+          data,
+          message: 'SMS sent successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to send SMS. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error sending SMS: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error sending SMS: $e',
-      };
+      _debugLog('SMS SEND ERROR', e.toString());
+      return _errorResponse('Error sending SMS: $e');
     }
   }
 
-  /// Receive SMS messages
-  /// 
-  /// Retrieves SMS sent to the web application since the previous invocation
-  /// 
-  /// Returns: List of received SMS messages
-  static Future<Map<String, dynamic>> receiveSMS() async {
+  /// Receive SMS messages sent to your application (MO).
+  ///
+  /// Per docs:
+  /// - endpoint: POST smsreceive
+  /// - required: version, applicationId, sourceAddress, message, requestId, encoding
+  static Future<Map<String, dynamic>> receiveSMS({
+    required String sourceAddress,
+    required String message,
+    required String requestId,
+    String version = _defaultVersion,
+    String encoding = '0', // 0 Text, 240 Flash, 245 Binary
+  }) async {
     try {
+      final url = _buildUri('smsreceive');
+
+      final Map<String, dynamic> body = {
+        'version': version,
+        'applicationId': appId,
+        'sourceAddress': _ensureTel(sourceAddress),
+        'message': message,
+        'requestId': requestId,
+        'encoding': encoding,
+      };
+
+      _debugLog('SMS RECEIVE URL', url.toString());
+      _debugLog('SMS RECEIVE BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/receive'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'version': '1.0',
-          'applicationId': appId,
-          'sourceAddress': 'tel:+8801234567890', // Placeholder
-          'message': '',
-          'requestId': 'APP_REQUEST',
-          'encoding': '0',
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog('SMS RECEIVE STATUS', response.statusCode);
+      _debugLog('SMS RECEIVE RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'SMS retrieved successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to receive SMS: ${response.statusCode}',
-        };
+        return _successResponse(
+          data,
+          message: 'SMS retrieved successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to receive SMS. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error receiving SMS: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error receiving SMS: $e',
-      };
+      _debugLog('SMS RECEIVE ERROR', e.toString());
+      return _errorResponse('Error receiving SMS: $e');
     }
   }
 
-  /// Get SMS delivery report
-  /// 
-  /// Returns the delivery status of a previously sent SMS
-  /// 
-  /// Parameters:
-  /// - [messageId]: ID of the SMS message to track
-  /// 
-  /// Returns: Delivery status information
+  /// Get SMS delivery report (normally Applink calls your endpoint as callback).
+  ///
+  /// Per docs:
+  /// - endpoint: POST smsreport
+  /// - required: destinationAddress, timeStamp (yyMMddHHmm), requestId, deliveryStatus
   static Future<Map<String, dynamic>> getSMSReport({
-    required String messageId,
+    required String destinationAddress,
+    required String timeStamp,
+    required String requestId,
+    required String deliveryStatus,
   }) async {
     try {
+      final url = _buildUri('smsreport');
+
+      final Map<String, dynamic> body = {
+        'destinationAddress': _ensureTel(destinationAddress),
+        'timeStamp': timeStamp,
+        'requestId': requestId,
+        'deliveryStatus': deliveryStatus,
+      };
+
+      _debugLog('SMS REPORT URL', url.toString());
+      _debugLog('SMS REPORT BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/sms/report'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'destinationAddress': 'tel:+8801234567890',
-          'timeStamp': '20240101000000',
-          'requestId': messageId,
-          'deliveryStatus': 'DELIVERED',
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog('SMS REPORT STATUS', response.statusCode);
+      _debugLog('SMS REPORT RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'Report retrieved successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to get report: ${response.statusCode}',
-        };
+        return _successResponse(
+          data,
+          message: 'Report retrieved successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to get report. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error getting SMS report: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error getting SMS report: $e',
-      };
+      _debugLog('SMS REPORT ERROR', e.toString());
+      return _errorResponse('Error getting SMS report: $e');
     }
   }
 
-  // ==================== SUBSCRIPTION SERVICES ====================
+  // =====================================================
+  //                 SUBSCRIPTION SERVICES
+  // =====================================================
 
-  /// Subscribe/Unsubscribe user
-  /// 
-  /// Parameters:
-  /// - [msisdn]: User's mobile number
-  /// - [subscriptionType]: Type of subscription (e.g., 'DAILY', 'WEEKLY', 'MONTHLY')
-  /// - [action]: 'subscribe' or 'unsubscribe'
-  /// - [shortCode]: Service short code
-  /// 
-  /// Returns: Subscription response
+  /// Subscribe / Unsubscribe user.
+  ///
+  /// Per docs:
+  /// - endpoint: POST subscriptionsend
+  /// - required: applicationId, password, subscriberId, action (0=unsub, 1=sub)
   static Future<Map<String, dynamic>> userSubscription({
     required String msisdn,
-    required String subscriptionType,
-    required String action,
-    required String shortCode,
+    required bool subscribe,
   }) async {
     try {
+      final url = _buildUri('subscriptionsend');
+
+      final Map<String, dynamic> body = {
+        'applicationId': appId,
+        'password': apiKey,
+        'subscriberId': _ensureTel(msisdn),
+        'action': subscribe ? '1' : '0',
+      };
+
+      _debugLog('USER SUBSCRIPTION URL', url.toString());
+      _debugLog('USER SUBSCRIPTION BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/send'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'applicationId': appId,
-          'password': apiKey,
-          'subscriberId': msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn',
-          'action': action == 'subscribe' ? '1' : '0', // 1 for subscribe, 0 for unsubscribe
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog('USER SUBSCRIPTION STATUS', response.statusCode);
+      _debugLog('USER SUBSCRIPTION RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'Subscription ${action}d successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to process subscription: ${response.statusCode}',
-        };
+        return _successResponse(
+          data,
+          message: subscribe
+              ? 'User subscribed successfully'
+              : 'User unsubscribed successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to process subscription. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error processing subscription: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error processing subscription: $e',
-      };
+      _debugLog('USER SUBSCRIPTION ERROR', e.toString());
+      return _errorResponse('Error processing subscription: $e');
     }
   }
 
-  /// Get the number of registered subscribers
-  /// 
-  /// Parameters:
-  /// - [shortCode]: Service short code
-  /// - [subscriptionType]: Type of subscription to query
-  /// 
-  /// Returns: Base size (number of subscribers)
-  static Future<Map<String, dynamic>> getBaseSize({
-    required String shortCode,
-    required String subscriptionType,
-  }) async {
+  /// Get base size (number of registered subscribers).
+  ///
+  /// Per docs:
+  /// - endpoint: POST subscriptionquery-base
+  /// - required: applicationId, password
+  static Future<Map<String, dynamic>> getBaseSize() async {
     try {
+      final url = _buildUri('subscriptionquery-base');
+
+      final Map<String, dynamic> body = {
+        'applicationId': appId,
+        'password': apiKey,
+      };
+
+      _debugLog('BASE SIZE URL', url.toString());
+      _debugLog('BASE SIZE BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/query-base'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'applicationId': appId,
-          'password': apiKey,
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog('BASE SIZE STATUS', response.statusCode);
+      _debugLog('BASE SIZE RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'Base size retrieved successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to get base size: ${response.statusCode}',
-        };
+        return _successResponse(
+          data,
+          message: 'Base size retrieved successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to get base size. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error getting base size: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error getting base size: $e',
-      };
+      _debugLog('BASE SIZE ERROR', e.toString());
+      return _errorResponse('Error getting base size: $e');
     }
   }
 
-  /// Get subscriber charging information
-  /// 
-  /// Parameters:
-  /// - [msisdn]: User's mobile number
-  /// - [shortCode]: Service short code
-  /// 
-  /// Returns: Subscriber charging information
+  /// Get subscriber charging information.
+  ///
+  /// Per docs:
+  /// - endpoint: POST subscriptiongetSubscriberChargingInfo
+  /// - required: applicationId, password, subscriberIds (max 10)
   static Future<Map<String, dynamic>> getSubscriberChargingInfo({
-    required String msisdn,
-    required String shortCode,
+    required List<String> msisdns,
   }) async {
     try {
+      if (msisdns.isEmpty) {
+        return _errorResponse('msisdns list cannot be empty');
+      }
+      if (msisdns.length > 10) {
+        return _errorResponse('Maximum 10 MSISDNs allowed per request');
+      }
+
+      final url = _buildUri('subscriptiongetSubscriberChargingInfo');
+
+      final subscriberIds =
+      msisdns.map((m) => _ensureTel(m)).toList();
+
+      final Map<String, dynamic> body = {
+        'applicationId': appId,
+        'password': apiKey,
+        'subscriberIds': subscriberIds,
+      };
+
+      _debugLog('GET SUBSCRIBER CHARGING INFO URL', url.toString());
+      _debugLog('GET SUBSCRIBER CHARGING INFO BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/getSubscriberChargingInfo'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'applicationId': appId,
-          'password': apiKey,
-          'subscriberIds': [
-            msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn'
-          ],
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
+
+      _debugLog(
+          'GET SUBSCRIBER CHARGING INFO STATUS', response.statusCode);
+      _debugLog(
+          'GET SUBSCRIBER CHARGING INFO RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'Charging info retrieved successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to get charging info: ${response.statusCode}',
-        };
+        return _successResponse(
+          data,
+          message: 'Charging info retrieved successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to get charging info. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error getting charging info: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error getting charging info: $e',
-      };
+      _debugLog('GET SUBSCRIBER CHARGING INFO ERROR', e.toString());
+      return _errorResponse('Error getting charging info: $e');
     }
   }
 
-  /// Send notification to subscriber
-  /// 
-  /// Parameters:
-  /// - [msisdn]: Recipient's mobile number
-  /// - [message]: Notification message
-  /// - [shortCode]: Service short code
-  /// 
-  /// Returns: Notification send response
+  /// Send subscription notification to user.
+  ///
+  /// Per docs:
+  /// - endpoint: POST subscriptionnotify
+  /// - required: timeStamp(yyMMddHHmm), version, applicationId, password,
+  ///   subscriberId, frequency(daily/weekly/monthly/yearly), status
   static Future<Map<String, dynamic>> sendNotification({
     required String msisdn,
-    required String message,
-    required String shortCode,
+    required String frequency, // daily, weekly, monthly, yearly
+    required String status, // REGISTERED, UNREGISTERED
+    String? timeStamp, // yyMMddHHmm
+    String version = _defaultVersion,
   }) async {
     try {
+      final url = _buildUri('subscriptionnotify');
+
+      final String ts =
+          timeStamp ?? formatTimestamp(DateTime.now().toUtc());
+
+      final Map<String, dynamic> body = {
+        'timeStamp': ts,
+        'version': version,
+        'applicationId': appId,
+        'password': apiKey,
+        'subscriberId': _ensureTel(msisdn),
+        'frequency': frequency,
+        'status': status,
+      };
+
+      _debugLog('SUBSCRIPTION NOTIFY URL', url.toString());
+      _debugLog('SUBSCRIPTION NOTIFY BODY', jsonEncode(body));
+
       final response = await http.post(
-        Uri.parse('$baseUrl/subscription/notify'),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode({
-          'version': '1.0',
-          'applicationId': appId,
-          'password': apiKey,
-          'subscriberId': msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn',
-          'message': message,
-          'frequency': 'daily',
-          'status': 'REGISTERED',
-        }),
+        url,
+        headers: _headers,
+        body: jsonEncode(body),
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'Notification sent successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to send notification: ${response.statusCode}',
-        };
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error sending notification: $e');
-      }
-      return {
-        'success': false,
-        'error': 'Error sending notification: $e',
-      };
-    }
-  }
-
-  // ==================== OTP SERVICES (For Login) ====================
-
-  /// Request OTP for login verification
-  /// 
-  /// Parameters:
-  /// - [msisdn]: User's mobile number
-  /// - [shortCode]: Service short code
-  /// 
-  /// Returns: OTP request response
-  static Future<Map<String, dynamic>> requestOTP({
-    required String msisdn,
-    required String shortCode,
-  }) async {
-    try {
-      // Ensure msisdn is in correct format
-      final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
-      
-      final url = '$baseUrl/otp/request';
-      final body = {
-        'applicationId': appId,
-        'password': apiKey,
-        'subscriberId': subscriberId,
-      };
-      
-      if (kDebugMode) {
-        print('=== OTP REQUEST ===');
-        print('URL: $url');
-        print('Body: ${jsonEncode(body)}');
-      }
-      
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 30));
-
-      if (kDebugMode) {
-        print('Status Code: ${response.statusCode}');
-        print('Response: ${response.body}');
-      }
+      _debugLog('SUBSCRIPTION NOTIFY STATUS', response.statusCode);
+      _debugLog('SUBSCRIPTION NOTIFY RESPONSE', response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'OTP sent successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'Failed to request OTP: ${response.statusCode} - ${response.body}',
-        };
+        return _successResponse(
+          data,
+          message: 'Notification sent successfully',
+        );
       }
+
+      return _errorResponse(
+        'Failed to send notification. Status: ${response.statusCode}',
+        statusCode: response.statusCode,
+        raw: response.body,
+      );
     } catch (e) {
-      if (kDebugMode) {
-        print('=== OTP REQUEST ERROR ===');
-        print('Error: $e');
-        print('Error type: ${e.runtimeType}');
-      }
-      return {
-        'success': false,
-        'error': 'Network Error: $e\n\nMake sure:\n1. Your internet is working\n2. API Key is correct\n3. App ID is correct',
-      };
+      _debugLog('SUBSCRIPTION NOTIFY ERROR', e.toString());
+      return _errorResponse('Error sending notification: $e');
     }
-  }
-
-  /// Verify OTP for login
-  /// 
-  /// Parameters:
-  /// - [msisdn]: User's mobile number
-  /// - [otpCode]: OTP code entered by user
-  /// - [shortCode]: Service short code
-  /// 
-  /// Returns: OTP verification response
-  static Future<Map<String, dynamic>> verifyOTP({
-    required String msisdn,
-    required String otpCode,
-    required String shortCode,
-  }) async {
-    try {
-      // Ensure msisdn is in correct format
-      final subscriberId = msisdn.startsWith('tel:') ? msisdn : 'tel:$msisdn';
-      
-      final url = '$baseUrl/otp/verify';
-      final body = {
-        'applicationId': appId,
-        'password': apiKey,
-        'referenceNo': otpCode,
-        'otp': otpCode,
-        'sourceAddress': subscriberId,
-      };
-      
-      if (kDebugMode) {
-        print('=== OTP VERIFY ===');
-        print('URL: $url');
-        print('Body: ${jsonEncode(body)}');
-      }
-      
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 30));
-
-      if (kDebugMode) {
-        print('Status Code: ${response.statusCode}');
-        print('Response: ${response.body}');
-      }
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'data': data,
-          'message': 'OTP verified successfully',
-        };
-      } else {
-        return {
-          'success': false,
-          'error': 'OTP verification failed: ${response.statusCode} - ${response.body}',
-        };
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('=== OTP VERIFY ERROR ===');
-        print('Error: $e');
-        print('Error type: ${e.runtimeType}');
-      }
-      return {
-        'success': false,
-        'error': 'Network Error: $e',
-      };
-    }
-  }
-
-  // ==================== TEST MODE (No Backend) ====================
-  
-  /// Test SMS sending (Simulates API without actual backend)
-  static Future<Map<String, dynamic>> testSendSMS({
-    required String phoneNumber,
-    required String message,
-  }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
-    
-    // Return mock response
-    return {
-      'success': true,
-      'data': {
-        'messageId': 'MSG_${DateTime.now().millisecondsSinceEpoch}',
-        'address': phoneNumber,
-        'message': message,
-        'status': 'SUBMITTED',
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-      'message': 'SMS queued for delivery (Test Mode)',
-    };
-  }
-
-  /// Test subscription (Simulates API without actual backend)
-  static Future<Map<String, dynamic>> testSubscription({
-    required String msisdn,
-    required String action,
-  }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
-    
-    // Return mock response
-    return {
-      'success': true,
-      'data': {
-        'msisdn': msisdn,
-        'action': action,
-        'status': 'PROCESSED',
-        'timestamp': DateTime.now().toIso8601String(),
-        'message': 'User ${action}d successfully (Test Mode)',
-      },
-      'message': 'Subscription processed (Test Mode)',
-    };
-  }
-
-  /// Test OTP request (Simulates API without actual backend)
-  static Future<Map<String, dynamic>> testRequestOTP({
-    required String msisdn,
-  }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 1));
-    
-    // Generate mock OTP
-    final mockOTP = '123456'; // In test mode, OTP is always 123456
-    
-    return {
-      'success': true,
-      'data': {
-        'msisdn': msisdn,
-        'otpSent': true,
-        'testOTP': mockOTP, // Only for testing
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-      'message': 'OTP sent (Test Mode - OTP: $mockOTP)',
-    };
-  }
-
-  /// Test OTP verification (Simulates API without actual backend)
-  static Future<Map<String, dynamic>> testVerifyOTP({
-    required String msisdn,
-    required String otpCode,
-  }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 1));
-    
-    // In test mode, accept any 6-digit code or '123456'
-    final isValidOTP = otpCode == '123456' || otpCode.length == 6;
-    
-    return {
-      'success': isValidOTP,
-      'data': {
-        'msisdn': msisdn,
-        'verified': isValidOTP,
-        'token': isValidOTP ? 'TEST_TOKEN_${DateTime.now().millisecondsSinceEpoch}' : null,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-      'message': isValidOTP ? 'OTP verified (Test Mode)' : 'Invalid OTP',
-    };
   }
 }

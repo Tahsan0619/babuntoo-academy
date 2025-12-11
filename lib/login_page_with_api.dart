@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../services/applink_api_service.dart';
-import '../utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPageWithAPI extends StatefulWidget {
@@ -11,119 +9,73 @@ class LoginPageWithAPI extends StatefulWidget {
 }
 
 class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController otpController = TextEditingController();
-  
-  bool isOTPSent = false;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   bool isLoading = false;
   String? errorMessage;
-  String? successMessage;
-  bool useTestMode = false; // Set to false to use real API
 
   @override
   void dispose() {
-    phoneController.dispose();
-    otpController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
+  Future<void> _login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
 
-  Future<void> requestOTP() async {
-    if (phoneController.text.isEmpty) {
-      setState(() => errorMessage = 'Please enter phone number');
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => errorMessage = 'Please enter email and password');
       return;
     }
 
-    // Validate phone number format
-    if (!phoneController.text.startsWith('+88') && !phoneController.text.startsWith('88')) {
-      setState(() => errorMessage = 'Phone must start with +88 or 88');
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      setState(() => errorMessage = 'Enter a valid email address');
       return;
     }
 
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-      successMessage = null;
-    });
-
-    try {
-      final phone = phoneController.text.startsWith('+88') 
-          ? phoneController.text 
-          : '+88${phoneController.text}';
-
-      final response = useTestMode
-          ? await ApplinkApiService.testRequestOTP(msisdn: phone)
-          : await ApplinkApiService.requestOTP(
-              msisdn: phone,
-              shortCode: ApplinkApiService.defaultShortCode,
-            );
-
-      if (response['success']) {
-        setState(() {
-          isOTPSent = true;
-          successMessage = response['message'] ?? 'OTP sent successfully';
-          if (useTestMode && response['data'] != null) {
-            successMessage = (successMessage ?? '') + '\n\n🧪 Test OTP: ${response['data']['testOTP']}';
-          }
-        });
-      } else {
-        setState(() => errorMessage = response['error'] ?? 'Failed to send OTP');
-      }
-    } catch (e) {
-      setState(() => errorMessage = 'Error: $e');
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  Future<void> verifyOTPAndLogin() async {
-    if (otpController.text.isEmpty) {
-      setState(() => errorMessage = 'Please enter OTP');
+    if (password.length < 6) {
+      setState(() => errorMessage = 'Password must be at least 6 characters');
       return;
     }
 
     setState(() {
       isLoading = true;
       errorMessage = null;
-      successMessage = null;
     });
 
     try {
-      final phone = phoneController.text.startsWith('+88') 
-          ? phoneController.text 
-          : '+88${phoneController.text}';
+      final prefs = await SharedPreferences.getInstance();
+      final savedEmail = prefs.getString('userEmail');
+      final savedPassword = prefs.getString('userPassword');
 
-      final response = useTestMode
-          ? await ApplinkApiService.testVerifyOTP(
-              msisdn: phone,
-              otpCode: otpController.text,
-            )
-          : await ApplinkApiService.verifyOTP(
-              msisdn: phone,
-              otpCode: otpController.text,
-              shortCode: ApplinkApiService.defaultShortCode,
-            );
-
-      if (response['success']) {
-        // Save phone number and token to local storage
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('userPhone', phone);
-        await prefs.setString('userToken', response['data']['token'] ?? '');
-        await prefs.setBool('isLoggedIn', true);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login successful!')),
-          );
-          // Navigate to home page
-          Navigator.of(context).pushReplacementNamed('/home');
-        }
-      } else {
-        setState(() => errorMessage = response['message'] ?? 'Invalid OTP');
+      if (savedEmail == null || savedPassword == null) {
+        setState(() => errorMessage = 'No account found. Please sign up first.');
+        return;
       }
+
+      if (savedEmail != email || savedPassword != password) {
+        setState(() => errorMessage = 'Invalid email or password');
+        return;
+      }
+
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('userToken', 'LOCAL_DEMO_TOKEN');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login successful!')),
+      );
+      Navigator.of(context).pushReplacementNamed('/home');
     } catch (e) {
       setState(() => errorMessage = 'Error: $e');
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -142,7 +94,6 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
           children: [
             const SizedBox(height: 20),
 
-            // Logo/Title
             const Text(
               'Babuntoo Academy',
               style: TextStyle(
@@ -153,7 +104,7 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Secure OTP-Based Login',
+              'Login with email & password',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
@@ -162,76 +113,38 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
             ),
             const SizedBox(height: 40),
 
-            // Mode Toggle
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: useTestMode ? Colors.orange[50] : Colors.green[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: useTestMode ? Colors.orange : Colors.green,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    useTestMode ? '🧪 Test Mode' : '🔗 Live Mode',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: useTestMode ? Colors.orange[900] : Colors.green[900],
-                    ),
-                  ),
-                  Switch(
-                    value: useTestMode,
-                    onChanged: isLoading ? null : (value) {
-                      setState(() => useTestMode = value);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-
-            // Phone Number Input
             TextField(
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: 'Phone Number',
-                hintText: '+8801234567890 or 8801234567890',
-                prefixIcon: const Icon(Icons.phone),
+                labelText: 'Email',
+                hintText: 'you@example.com',
+                prefixIcon: const Icon(Icons.email),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                errorText: errorMessage != null && !isOTPSent ? errorMessage : null,
+                errorText: errorMessage,
               ),
-              enabled: !isOTPSent && !isLoading,
+              enabled: !isLoading,
             ),
             const SizedBox(height: 16),
 
-            // OTP Input (shown after OTP is sent)
-            if (isOTPSent) ...[
-              TextField(
-                controller: otpController,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                decoration: InputDecoration(
-                  labelText: 'Enter OTP',
-                  hintText: '123456',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  counterText: '',
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: 'Minimum 6 characters',
+                prefixIcon: const Icon(Icons.lock),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                enabled: !isLoading,
               ),
-              const SizedBox(height: 16),
-            ],
+              enabled: !isLoading,
+            ),
+            const SizedBox(height: 16),
 
-            // Error Message
-            if (errorMessage != null)
+            if (errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -252,35 +165,13 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
                   ],
                 ),
               ),
-            if (errorMessage != null) const SizedBox(height: 16),
+              const SizedBox(height: 16),
+            ],
 
-            // Success Message
-            if (successMessage != null)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green[300]!),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle_outline, color: Colors.green[700]),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        successMessage!,
-                        style: TextStyle(color: Colors.green[700]),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (successMessage != null) const SizedBox(height: 16),
-
-            // Main Action Button
             ElevatedButton(
-              onPressed: isLoading ? null : (isOTPSent ? verifyOTPAndLogin : requestOTP),
+              onPressed: isLoading
+                  ? null
+                  : _login,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: Colors.blue,
@@ -288,54 +179,27 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
               ),
               child: isLoading
                   ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : Text(
-                      isOTPSent ? 'Verify & Login' : 'Send OTP',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor:
+                  AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+                  : const Text(
+                'Login',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
 
-            // Reset Button (if OTP is sent)
-            if (isOTPSent)
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        setState(() {
-                          isOTPSent = false;
-                          otpController.clear();
-                          errorMessage = null;
-                          successMessage = null;
-                        });
-                      },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.grey[400],
-                ),
-                child: const Text(
-                  'Back',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
             const SizedBox(height: 24),
 
-            // Sign Up Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -358,4 +222,3 @@ class _LoginPageWithAPIState extends State<LoginPageWithAPI> {
     );
   }
 }
-

@@ -1,252 +1,110 @@
 # Babuntoo Academy
 
-A comprehensive Flutter educational application designed to teach computer science fundamentals, programming languages, hardware components, software knowledge, and inspiring stories of scientists.
+A Flutter learning app that covers computer science fundamentals, programming (C & Python), hardware, software, scientists, inventions, challenges, games, and an AI-powered code playground.
 
-## 🚀 Quick Start - Setup & Run on Your Local Device
+## 🧭 Overview
 
-### Prerequisites
+- Learning modules for hardware, software, programming, scientists timeline, and latest inventions
+- Interactive C learning paths, challenges, and educational games (e.g., Hangman)
+- Code Playground with AI explanations (requires your own Groq API key)
+- Responsive UI, dark/light themes, and reusable widgets
+- Simple email/password demo auth (local `SharedPreferences`) that you can swap for your backend later
 
-Before you begin, ensure you have the following installed:
+## 🚀 Quick Start
 
-1. **Flutter SDK** (3.0 or higher)
-   - Download from: https://flutter.dev/docs/get-started/install
-   - Verify installation: `flutter --version`
+Prerequisites: Flutter 3.0+, Dart 3+, Git, and platform SDKs (Android Studio / Xcode as needed).
 
-2. **Dart** (included with Flutter)
-   - Verify: `dart --version`
-
-3. **Git**
-   - Download from: https://git-scm.com/
-
-4. **IDE/Editor** (choose one)
-   - Android Studio (recommended)
-   - VS Code with Flutter extension
-   - IntelliJ IDEA
-
-5. **Android/iOS Setup**
-   - For Android: Android Studio with SDK 21+
-   - For iOS: Xcode 12+ (Mac only)
-
-
-
-### Step 1: Clone the Repository
-
+1) Clone and install
 ```bash
 git clone https://github.com/Tahsan0619/babuntoo-academy.git
 cd babuntoo_academy
-```
-
-### Step 2: Install Dependencies
-
-```bash
 flutter pub get
 ```
 
-This command downloads all required packages listed in `pubspec.yaml`.
+2) (Optional) Enable Code Playground
+- Open `lib/code_playground_screen.dart`
+- Set your Groq API key where indicated; keys are stored via `flutter_secure_storage`
 
-### Step 3: Configure API Keys (Required for Code Playground)
-
-The Code Playground feature requires a Groq API key to execute and explain code snippets. 
-
-**⚠️ IMPORTANT - API Key Policy:**
-
-For security and ethical reasons, **API keys should never be shared or hardcoded in public repositories**. If you want to use the Code Playground feature:
-
-**Option A: Get Your Own API Key**
-1. Sign up for Groq API at: https://console.groq.com
-2. Generate your own API key
-3. Open `lib/code_playground_screen.dart`
-4. Find line 9:
-   ```dart
-   const _groqKeyStorageKey = 'YOUR_GROQ_API_KEY_HERE';
-   ```
-5. Replace `YOUR_GROQ_API_KEY_HERE` with your own Groq API key
-6. The app will securely store it on first launch
-
-**Option B: Request API Key from Developer**
-If you're unable to obtain your own API key or prefer to request one:
-- **Contact**: tahsan@example.com
-- **GitHub Issues**: https://github.com/Tahsan0619/babuntoo-academy/issues
-- Explain your use case and I can provide guidance
-
-**Security Note**: 
-- Never commit API keys to version control
-- API keys are stored securely using `flutter_secure_storage`
-- Each user should use their own API key for production use
-
-### Step 4: Run the App
-
-#### On Android Device/Emulator:
+3) Run
 ```bash
-flutter run
+flutter run           # Android/iOS/emulator
+flutter run -d chrome # Web
+flutter run -d windows  # Windows desktop
 ```
 
-#### On iOS Device/Simulator (Mac only):
-```bash
-flutter run -d ios
-```
+## 🔐 Authentication (Demo)
 
-#### On Web Browser:
-```bash
-flutter run -d chrome
-```
+- Email/password flows live in `login_page_with_api.dart` and `signup_page_with_api.dart`
+- Credentials are stored locally in `SharedPreferences` for demo only (plain text)
+- Replace with your real backend when ready; update the login/signup pages accordingly
 
-#### On Windows/Linux (Desktop):
-```bash
-flutter run -d windows
-# or
-flutter run -d linux
-```
+## ✨ Key Features
 
-### Step 5: View the App
+- Hardware learning: CPUs, GPUs, RAM, storage, peripherals
+- Software catalog: OS, productivity, dev tools, multimedia, security
+- Programming tutorials: C (basics → memory mgmt), Python fundamentals
+- Scientists timeline and latest inventions
+- Interactive learning paths, challenges, and educational games
+- Code Playground: run/explain/review snippets (Python/C) with AI help
 
-The app will launch with:
-- **Splash Screen**: Loading animation
-- **Login/Signup**: Create or access your account
-- **Home Menu**: Access all features
-
----
-
-## 📚 How to Use the App
-
-### Main Features
-
-#### 1. **Hardware Learning**
-- Navigate: Home → Hardware
-- Learn about CPUs, GPUs, RAM, Storage, and Peripherals
-- View detailed diagrams and specifications
-
-#### 2. **Software Catalog**
-- Navigate: Home → Software
-- Browse popular applications by category
-- Learn software functionalities
-
-#### 3. **Learn Programming**
-- Navigate: Home → Learn Programming
-- Choose between C or Python
-- Access interactive tutorials with examples
-
-#### 4. **Code Playground**
-- Navigate: Home → Code Playground
-- Write and execute code snippets
-- Get AI-powered explanations
-- Supports Python and C
-
-#### 5. **Scientists Timeline**
-- Navigate: Home → Scientists
-- Discover famous scientists and their contributions
-- Browse historical timeline
-
-#### 6. **Latest Inventions**
-- Navigate: Home → Latest Inventions
-- Stay updated with cutting-edge technology
-
-#### 7. **Interactive Learning**
-- Navigate: Home → Interactive Learning
-- Deep dive into C programming topics
-- Topics include:
-  - Basics (Variables, Data Types, I/O)
-  - Operators (Arithmetic, Logical, Bitwise)
-  - Control Flow (if/else, switch)
-  - Loops (for, while, do-while)
-  - Functions & Recursion
-  - Pointers & Arrays
-  - Strings & Memory Management
-  - And more...
-
-#### 8. **Games**
-- Navigate: Home → Games
-- Play educational games (Hangman, etc.)
-- Test your knowledge
-
-#### 9. **Challenges**
-- Navigate: Home → Challenges
-- Solve programming challenges
-- Track your progress
-
----
-
-## 🛠️ Troubleshooting
-
-### Issue: "flutter: command not found"
-**Solution**: Add Flutter to your PATH
-- Windows: Add Flutter\bin to system Environment Variables
-- Mac/Linux: Add to ~/.bashrc or ~/.zshrc
-  ```bash
-  export PATH="$PATH:~/path/to/flutter/bin"
-  ```
-
-### Issue: "No devices found"
-**Solution**:
-```bash
-flutter devices  # List connected devices
-flutter emulators  # List available emulators
-flutter emulators --launch <emulator_name>  # Launch emulator
-```
-
-### Issue: "Package version conflict"
-**Solution**:
-```bash
-flutter clean
-flutter pub get
-flutter pub upgrade
-```
-
-### Issue: "API Key not working"
-**Solution**:
-- Verify your Groq API key is valid
-- Check internet connection
-- Make sure key is set in `lib/code_playground_screen.dart`
-
-### Issue: App crashes on launch
-**Solution**:
-```bash
-flutter clean
-flutter pub get
-flutter run --verbose  # Shows detailed error messages
-```
-
----
-
-## 📦 Project Structure
+## 🧱 Project Structure (high level)
 
 ```
 lib/
-├── main.dart                    # App entry point
-├── home_page.dart              # Main menu
-├── hardware_page.dart          # Hardware learning
-├── software_page.dart          # Software catalog
+├── main.dart                     # Entry & routes
+├── splash_screen.dart
+├── login_page_with_api.dart      # Demo email/password auth
+├── signup_page_with_api.dart
+├── home_page.dart
+├── hardware_page.dart
+├── software_page.dart
 ├── scientists_timeline_page.dart
 ├── latest_inventions_page.dart
-├── code_playground_screen.dart # AI Code execution
-├── interactive learning/       # Interactive tutorials
-│   └── C/
-│       ├── basics/
-│       ├── operators/
-│       ├── loops/
-│       ├── functions/
-│       ├── pointers/
-│       ├── arrays/
-│       └── ...
-├── challenge/                  # Programming challenges
-├── games/                      # Educational games
-├── education/                  # Learning models
-├── widgets/                    # Reusable components
-├── models/                     # Data models
-└── utils/                      # Utilities & constants
+├── programming_languages_page.dart
+├── learn_programming_menu_page.dart
+├── interactive learning/         # Interactive C/Python content
+├── challenge/                    # Challenges
+├── games/                        # Educational games (Hangman, etc.)
+├── playground/ & code_playground_screen.dart
+├── education/                    # Education models & quizzes
+├── widgets/                      # Reusable UI components
+├── models/                       # Data models
+└── utils/                        # Constants, theme, navigation
 ```
 
----
+## 🛠️ Build & Platform Targets
 
-## 💡 Tips for Development
-
-### Hot Reload
-Press `r` in terminal to hot reload (fast UI changes)
 ```bash
-flutter run
-# Then press 'r' to reload
-# Press 'R' to restart the app
+flutter build apk        # Android
+flutter build appbundle  # Play Store bundle
+flutter build ios        # iOS (on macOS)
+flutter build web        # Web
 ```
+
+## 🔧 Troubleshooting
+
+- `flutter: command not found`: add Flutter `bin` to PATH
+- No devices: `flutter devices`, `flutter emulators --launch <name>`
+- Version conflicts: `flutter clean && flutter pub get`
+- App crash: `flutter run --verbose` for detailed logs
+- Code Playground issues: ensure a valid Groq API key is set
+
+## 🤝 Contributing
+
+1. Fork → create a branch → commit → open PR
+2. Keep secrets out of source control (use env/secure storage)
+3. Follow Dart/Flutter lints from `analysis_options.yaml`
+
+## 📜 License
+
+MIT License (see `LICENSE` if present).
+
+## 📫 Support
+
+- Issues: https://github.com/Tahsan0619/babuntoo-academy/issues
+- Email: tahsan@example.com
+
+Made with ❤️ for learners and educators.
 
 ### Debug Mode
 Run with more information:
