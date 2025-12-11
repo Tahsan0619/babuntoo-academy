@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('App Version: 1.07Early (Build 1.087${info.buildNumber})'),
+              Text('App Version: 1.08 (Build 1.08${info.buildNumber})'),
               const SizedBox(height: 12),
               const Text(
                 "What is present:(1.01)",
@@ -147,6 +147,21 @@ class _HomePageState extends State<HomePage> {
               const Text("• Fixed 1 small bug"),
               const Text(
                   "• Full remake of Hardware section(still in progress)"),
+              const Text(
+                "What is new:(1.08)",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text("• 5 Educational Games added"),
+              const Text("• Hangman with 3 difficulty levels & scoring"),
+              const Text("• Math Master - timed arithmetic challenge"),
+              const Text("• Memory Match - card matching game"),
+              const Text("• Typing Challenge - speed typing test"),
+              const Text("• Logic Puzzle - brain teasers & patterns"),
+              const Text("• 100% responsive design for all mobile devices"),
+              const Text("• Simplified subscription system (Free Plan)"),
+              const Text("• Removed legacy API dependencies"),
+              const Text("• All games production ready & fully playable"),
             ],
           ),
         ),
