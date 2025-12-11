@@ -22,6 +22,8 @@ class _LogicPuzzleGameView extends StatelessWidget {
     final controller = context.read<LogicPuzzleController>();
     final state = controller.state;
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.height < 700;
 
     return Scaffold(
       appBar: AppBar(
@@ -32,58 +34,72 @@ class _LogicPuzzleGameView extends StatelessWidget {
           ? _GameOverView(
               correctAnswers: state.correctAnswers,
               totalPuzzles: state.totalPuzzles,
+              screenSize: screenSize,
             )
           : Center(
               child: SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500),
+                  constraints: BoxConstraints(
+                    maxWidth: screenSize.width * 0.95,
+                    maxHeight: screenSize.height * 1.3,
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenSize.width > 600 ? 32 : 16,
+                      vertical: 12,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Score: ${state.correctAnswers}/${state.totalPuzzles}',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Score: ${state.correctAnswers}/${state.totalPuzzles}',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Q${state.currentPuzzleIndex + 1}',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                              const SizedBox(width: 8),
+                              Text(
+                                'Q${state.currentPuzzleIndex + 1}',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         LinearProgressIndicator(
                           value: (state.currentPuzzleIndex + 1) /
                               state.totalPuzzles,
                           minHeight: 6,
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
                         // Puzzle
                         Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
                             state.currentPuzzle.title,
-                            style: theme.textTheme.titleLarge?.copyWith(
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.onPrimaryContainer,
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
                         // Options
                         if (!controller.showExplanation)
                           GridView.builder(
@@ -92,9 +108,9 @@ class _LogicPuzzleGameView extends StatelessWidget {
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 1.8,
                             ),
                             itemCount:
                                 state.currentPuzzle.options.length,
@@ -218,16 +234,19 @@ class _OptionButtonState extends State<_OptionButton> {
 class _GameOverView extends StatelessWidget {
   final int correctAnswers;
   final int totalPuzzles;
+  final Size screenSize;
 
   const _GameOverView({
     required this.correctAnswers,
     required this.totalPuzzles,
+    required this.screenSize,
   });
 
   @override
   Widget build(BuildContext context) {
     final percentage = (correctAnswers / totalPuzzles * 100).toStringAsFixed(1);
     final theme = Theme.of(context);
+    final isTall = screenSize.height > 700;
 
     String message;
     String emoji;
@@ -248,26 +267,32 @@ class _GameOverView extends StatelessWidget {
     return Center(
       child: SingleChildScrollView(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: BoxConstraints(
+            maxWidth: screenSize.width * 0.9,
+            maxHeight: screenSize.height,
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenSize.width > 600 ? 32 : 16,
+              vertical: 20,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   emoji,
-                  style: const TextStyle(fontSize: 80),
+                  style: TextStyle(fontSize: isTall ? 80 : 60),
                 ),
                 const SizedBox(height: 24),
                 Text(
                   message,
-                  style: theme.textTheme.displaySmall?.copyWith(
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),

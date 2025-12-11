@@ -162,8 +162,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _showUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final userName = prefs.getString('userName') ?? 'Guest User';
-    final userPhone = prefs.getString('userPhone') ?? 'Not available';
-    final isSubscribed = prefs.getBool('userSubscribed') ?? false;
+    final userEmail = prefs.getString('userEmail') ?? 'Not available';
+    // Placeholder for subscription - to be implemented with real backend
+    final subscriptionStatus = 'Free Plan';
 
     if (mounted) {
       showDialog(
@@ -193,7 +194,7 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Phone: $userPhone',
+                'Email: $userEmail',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -203,11 +204,11 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isSubscribed ? Colors.green : Colors.orange,
+                      color: subscriptionStatus == 'Free Plan' ? Colors.orange : Colors.green,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      isSubscribed ? 'Active' : 'Inactive',
+                      subscriptionStatus,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

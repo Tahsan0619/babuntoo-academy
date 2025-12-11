@@ -23,6 +23,8 @@ class _HangmanGameView extends StatelessWidget {
     final controller = Provider.of<HangmanController>(context);
     final state = controller.state;
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.height < 700;
 
     if (controller.showDifficultySelection) {
       return Scaffold(
@@ -30,50 +32,53 @@ class _HangmanGameView extends StatelessWidget {
         body: Center(
           child: SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.psychology,
-                    size: 64,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    "Select Difficulty",
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+              constraints: BoxConstraints(maxWidth: screenSize.width * 0.9),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.psychology,
+                      size: isSmallScreen ? 48 : 64,
+                      color: theme.colorScheme.primary,
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  _DifficultyButton(
-                    difficulty: HangmanDifficulty.easy,
-                    title: "Easy",
-                    description: "Simple words, 6 mistakes allowed",
-                    color: Colors.green,
-                    onSelect: () =>
-                        controller.selectDifficulty(HangmanDifficulty.easy),
-                  ),
-                  const SizedBox(height: 12),
-                  _DifficultyButton(
-                    difficulty: HangmanDifficulty.medium,
-                    title: "Medium",
-                    description: "Regular words, 6 mistakes allowed",
-                    color: Colors.orange,
-                    onSelect: () =>
-                        controller.selectDifficulty(HangmanDifficulty.medium),
-                  ),
-                  const SizedBox(height: 12),
-                  _DifficultyButton(
-                    difficulty: HangmanDifficulty.hard,
-                    title: "Hard",
-                    description: "Complex words, 6 mistakes allowed",
-                    color: Colors.red,
-                    onSelect: () =>
-                        controller.selectDifficulty(HangmanDifficulty.hard),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    Text(
+                      "Select Difficulty",
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    _DifficultyButton(
+                      difficulty: HangmanDifficulty.easy,
+                      title: "Easy",
+                      description: "Simple words, 6 mistakes allowed",
+                      color: Colors.green,
+                      onSelect: () =>
+                          controller.selectDifficulty(HangmanDifficulty.easy),
+                    ),
+                    const SizedBox(height: 12),
+                    _DifficultyButton(
+                      difficulty: HangmanDifficulty.medium,
+                      title: "Medium",
+                      description: "Regular words, 6 mistakes allowed",
+                      color: Colors.orange,
+                      onSelect: () =>
+                          controller.selectDifficulty(HangmanDifficulty.medium),
+                    ),
+                    const SizedBox(height: 12),
+                    _DifficultyButton(
+                      difficulty: HangmanDifficulty.hard,
+                      title: "Hard",
+                      description: "Complex words, 6 mistakes allowed",
+                      color: Colors.red,
+                      onSelect: () =>
+                          controller.selectDifficulty(HangmanDifficulty.hard),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -100,145 +105,172 @@ class _HangmanGameView extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 16),
-                // Stats and Difficulty Display
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _StatCard(
-                        label: "Difficulty",
-                        value: state.difficulty.name.toUpperCase(),
-                        color: _getDifficultyColor(state.difficulty),
-                      ),
-                      _StatCard(
-                        label: "Score",
-                        value: "${state.score}",
-                        color: Colors.blue,
-                      ),
-                      _StatCard(
-                        label: "Won/Lost",
-                        value: "${state.totalRoundsWon}/${state.totalRoundsLost}",
-                        color: Colors.purple,
-                      ),
-                    ],
+            constraints: BoxConstraints(
+              maxWidth: screenSize.width * 0.95,
+              maxHeight: screenSize.height,
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenSize.width > 600 ? 32 : 16,
+                vertical: 12,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Stats and Difficulty Display
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceEvenly,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _StatCard(
+                          label: "Difficulty",
+                          value: state.difficulty.name.toUpperCase(),
+                          color: _getDifficultyColor(state.difficulty),
+                        ),
+                        _StatCard(
+                          label: "Score",
+                          value: "${state.score}",
+                          color: Colors.blue,
+                        ),
+                        _StatCard(
+                          label: "Won/Lost",
+                          value: "${state.totalRoundsWon}/${state.totalRoundsLost}",
+                          color: Colors.purple,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _HangmanDisplay(wrongGuesses: state.wrongGuesses),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      Text(
-                        state.displayWord,
-                        style: TextStyle(
-                          fontSize: 36,
-                          letterSpacing: 4,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Hint: ${state.hint}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Remaining Guesses: ${state.remainingGuesses}/${state.maxWrongGuesses}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: state.remainingGuesses <= 2
-                              ? Colors.redAccent
-                              : theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  // Hangman Display with responsive sizing
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: _HangmanDisplay(
+                      wrongGuesses: state.wrongGuesses,
+                      size: isSmallScreen ? 140 : 180,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _AlphabetGrid(
-                  guessedLetters: state.guessedLetters,
-                  onGuess: state.isGameOver
-                      ? null
-                      : (letter) => controller.guessLetter(letter),
-                ),
-                const SizedBox(height: 16),
-                if (state.isGameOver)
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: state.isWon
-                              ? Colors.green.withOpacity(0.1)
-                              : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: state.isWon
-                                ? Colors.green
-                                : Colors.redAccent,
-                            width: 2,
+                  const SizedBox(height: 16),
+                  // Word and Hint
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      children: [
+                        Text(
+                          state.displayWord,
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 28 : 36,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            'Hint: ${state.hint}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontStyle: FontStyle.italic,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              state.isWon ? "🎉" : "💀",
-                              style: const TextStyle(fontSize: 48),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Remaining: ${state.remainingGuesses}/${state.maxWrongGuesses}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: state.remainingGuesses <= 2
+                                ? Colors.redAccent
+                                : theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Alphabet Grid
+                  _AlphabetGrid(
+                    guessedLetters: state.guessedLetters,
+                    onGuess: state.isGameOver
+                        ? null
+                        : (letter) => controller.guessLetter(letter),
+                    screenWidth: screenSize.width,
+                  ),
+                  const SizedBox(height: 16),
+                  // Game Over Screen
+                  if (state.isGameOver)
+                    Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: state.isWon
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  state.isWon ? Colors.green : Colors.redAccent,
+                              width: 2,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              state.isWon
-                                  ? "Congratulations! You won."
-                                  : "Game Over!\nThe word was: ${state.word}",
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                color: state.isWon
-                                    ? Colors.green
-                                    : Colors.redAccent,
-                                fontWeight: FontWeight.bold,
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                state.isWon ? "🎉" : "💀",
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 36 : 48,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            if (state.isWon) ...[
                               const SizedBox(height: 8),
                               Text(
-                                "Round Score: +${state.calculateRoundScore()}",
-                                style:
-                                    theme.textTheme.bodyLarge?.copyWith(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                state.isWon
+                                    ? "Congratulations! You won."
+                                    : "Game Over!\nThe word was: ${state.word}",
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: state.isWon
+                                      ? Colors.green
+                                      : Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
+                              if (state.isWon) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Round Score: +${state.calculateRoundScore()}",
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: controller.newGame,
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text("Play Again"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 12),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: controller.newGame,
+                          icon: const Icon(Icons.play_arrow),
+                          label: const Text("Play Again"),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: isSmallScreen ? 10 : 12,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                const SizedBox(height: 16),
-              ],
+                      ],
+                    ),
+                  const SizedBox(height: 12),
+                ],
+              ),
             ),
           ),
         ),
@@ -353,15 +385,18 @@ class _DifficultyButton extends StatelessWidget {
 
 class _HangmanDisplay extends StatelessWidget {
   final int wrongGuesses;
-  final int maxParts = 6;
+  final double size;
 
-  const _HangmanDisplay({required this.wrongGuesses});
+  const _HangmanDisplay({
+    required this.wrongGuesses,
+    this.size = 180,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
-      width: 150,
+      height: size,
+      width: size * 0.8,
       child: CustomPaint(
         painter: _HangmanPainter(wrongGuesses: wrongGuesses),
       ),
@@ -431,10 +466,12 @@ class _HangmanPainter extends CustomPainter {
 class _AlphabetGrid extends StatelessWidget {
   final Set<String> guessedLetters;
   final void Function(String letter)? onGuess;
+  final double screenWidth;
 
   const _AlphabetGrid({
     required this.guessedLetters,
     this.onGuess,
+    this.screenWidth = 400,
     super.key,
   });
 
@@ -442,34 +479,48 @@ class _AlphabetGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     const String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     final theme = Theme.of(context);
+    
+    // Adaptive button size based on screen width
+    double buttonSize = screenWidth > 600 ? 40 : 36;
+    if (screenWidth < 350) buttonSize = 32;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Wrap(
         alignment: WrapAlignment.center,
         spacing: 4,
         runSpacing: 4,
         children: letters.split('').map((letter) {
           final guessed = guessedLetters.contains(letter);
-          return OutlinedButton(
-            onPressed:
-                (guessed || onGuess == null) ? null : () => onGuess!(letter),
-            style: OutlinedButton.styleFrom(
-              backgroundColor: guessed
-                  ? theme.disabledColor.withOpacity(0.1)
-                  : null,
-              foregroundColor: guessed
-                  ? theme.disabledColor
-                  : theme.colorScheme.primary,
-              minimumSize: const Size(36, 36),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          return SizedBox(
+            width: buttonSize,
+            height: buttonSize,
+            child: OutlinedButton(
+              onPressed:
+                  (guessed || onGuess == null) ? null : () => onGuess!(letter),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: guessed
+                    ? theme.disabledColor.withOpacity(0.1)
+                    : null,
+                foregroundColor: guessed
+                    ? theme.disabledColor
+                    : theme.colorScheme.primary,
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                side: BorderSide(
+                  color: theme.colorScheme.primary.withOpacity(0.3),
+                ),
               ),
-              side: BorderSide(
-                color: theme.colorScheme.primary.withOpacity(0.3),
+              child: Text(
+                letter,
+                style: TextStyle(
+                  fontSize: screenWidth < 350 ? 12 : 13,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            child: Text(letter),
           );
         }).toList(),
       ),

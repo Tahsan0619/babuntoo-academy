@@ -54,6 +54,8 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
     final controller = context.read<MathMasterController>();
     final state = controller.state;
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.height < 700;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,13 +63,23 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
         elevation: 0,
       ),
       body: state.isGameOver
-          ? _GameOverView(score: state.score, totalQuestions: state.totalQuestions)
+          ? _GameOverView(
+              score: state.score,
+              totalQuestions: state.totalQuestions,
+              screenSize: screenSize,
+            )
           : Center(
               child: SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500),
+                  constraints: BoxConstraints(
+                    maxWidth: screenSize.width * 0.95,
+                    maxHeight: screenSize.height * 1.2,
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenSize.width > 600 ? 32 : 16,
+                      vertical: 12,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -75,12 +87,16 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Score: ${state.score}',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                'Score: ${state.score}',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
+                            const SizedBox(width: 12),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -97,6 +113,7 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -107,42 +124,45 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                           value: (state.currentQuestionIndex + 1) / state.totalQuestions,
                           minHeight: 6,
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
                         // Question
                         Text(
-                          'Question ${state.currentQuestionIndex + 1} of ${state.totalQuestions}',
+                          'Q${state.currentQuestionIndex + 1}/${state.totalQuestions}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
                             children: [
-                              Text(
-                                '${state.currentQuestion.num1} ${state.currentQuestion.operator} ${state.currentQuestion.num2}',
-                                style: theme.textTheme.displayMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onPrimaryContainer,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '${state.currentQuestion.num1} ${state.currentQuestion.operator} ${state.currentQuestion.num2}',
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.onPrimaryContainer,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              const Text(
+                              const SizedBox(height: 12),
+                              Text(
                                 '= ?',
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: isSmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
                         // Options
                         GridView.builder(
                           shrinkWrap: true,
@@ -150,9 +170,9 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 2.5,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            childAspectRatio: 2.2,
                           ),
                           itemCount: state.currentQuestion.options.length,
                           itemBuilder: (ctx, idx) {
@@ -163,6 +183,7 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                             );
                           },
                         ),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   ),
@@ -226,10 +247,12 @@ class _OptionButtonState extends State<_OptionButton> {
 class _GameOverView extends StatelessWidget {
   final int score;
   final int totalQuestions;
+  final Size screenSize;
 
   const _GameOverView({
     required this.score,
     required this.totalQuestions,
+    required this.screenSize,
   });
 
   @override
@@ -240,26 +263,32 @@ class _GameOverView extends StatelessWidget {
     return Center(
       child: SingleChildScrollView(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: BoxConstraints(
+            maxWidth: screenSize.width * 0.9,
+            maxHeight: screenSize.height,
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenSize.width > 600 ? 32 : 16,
+              vertical: 20,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   score > totalQuestions * 5 ? '🎉' : '💪',
-                  style: const TextStyle(fontSize: 80),
+                  style: TextStyle(fontSize: screenSize.height > 700 ? 80 : 60),
                 ),
                 const SizedBox(height: 24),
                 Text(
                   'Game Over!',
-                  style: theme.textTheme.displaySmall?.copyWith(
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
@@ -275,7 +304,7 @@ class _GameOverView extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         score.toString(),
-                        style: theme.textTheme.displayMedium?.copyWith(
+                        style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onPrimaryContainer,
                         ),
