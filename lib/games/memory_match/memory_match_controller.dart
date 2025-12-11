@@ -17,68 +17,90 @@ class MemoryMatchController extends ChangeNotifier {
       moves: 0,
       matchedPairs: 0,
       isGameOver: false,
+      firstFlippedIndex: null,
+      secondFlippedIndex: null,
+      isChecking: false,
     );
   }
 
   void flipCard(int index) {
     if (_state.isGameOver || _state.isChecking) return;
-    if (_state.cards[index].isMatched) return;
-    if (index == _state.firstFlippedIndex || index == _state.secondFlippedIndex) {
-      return;
-    }
-
-    final updatedCards = List.of(_state.cards);
+    if (_state.cards[index].isMatched || _state.cards[index].isFlipped) return;
+    
+    final updatedCards = List<MemoryCard>.from(_state.cards);
     updatedCards[index] = updatedCards[index].copyWith(isFlipped: true);
 
     if (_state.firstFlippedIndex == null) {
-      _state = _state.copyWith(
+      // First card flip
+      _state = MemoryMatchState(
         cards: updatedCards,
+        moves: _state.moves,
+        matchedPairs: _state.matchedPairs,
+        isGameOver: _state.isGameOver,
         firstFlippedIndex: index,
+        secondFlippedIndex: null,
+        isChecking: false,
       );
+      notifyListeners();
     } else if (_state.secondFlippedIndex == null) {
-      _state = _state.copyWith(
+      // Second card flip
+      _state = MemoryMatchState(
         cards: updatedCards,
+        moves: _state.moves,
+        matchedPairs: _state.matchedPairs,
+        isGameOver: _state.isGameOver,
+        firstFlippedIndex: _state.firstFlippedIndex,
         secondFlippedIndex: index,
         isChecking: true,
       );
+      notifyListeners();
       _checkForMatch();
     }
-
-    notifyListeners();
   }
 
   void _checkForMatch() {
     Future.delayed(const Duration(milliseconds: 600), () {
-      final first = _state.firstFlippedIndex!;
-      final second = _state.secondFlippedIndex!;
+      final first = _state.firstFlippedIndex;
+      final second = _state.secondFlippedIndex;
+      
+      if (first == null || second == null) return;
 
-      if (_state.cards[first].value == _state.cards[second].value) {
+      final updatedCards = List<MemoryCard>.from(_state.cards);
+      final newMoves = _state.moves + 1;
+
+      if (updatedCards[first].value == updatedCards[second].value) {
         // Match found
-        final updatedCards = List.of(_state.cards);
-        updatedCards[first] = updatedCards[first].copyWith(isMatched: true);
-        updatedCards[second] = updatedCards[second].copyWith(isMatched: true);
+        updatedCards[first] = updatedCards[first].copyWith(
+          isMatched: true,
+          isFlipped: true,
+        );
+        updatedCards[second] = updatedCards[second].copyWith(
+          isMatched: true,
+          isFlipped: true,
+        );
 
         final newMatchedPairs = _state.matchedPairs + 1;
         final isGameOver = newMatchedPairs == _state.totalPairs;
 
-        _state = _state.copyWith(
+        _state = MemoryMatchState(
           cards: updatedCards,
+          moves: newMoves,
           matchedPairs: newMatchedPairs,
-          moves: _state.moves + 1,
+          isGameOver: isGameOver,
           firstFlippedIndex: null,
           secondFlippedIndex: null,
           isChecking: false,
-          isGameOver: isGameOver,
         );
       } else {
-        // No match
-        final updatedCards = List.of(_state.cards);
+        // No match - flip back
         updatedCards[first] = updatedCards[first].copyWith(isFlipped: false);
         updatedCards[second] = updatedCards[second].copyWith(isFlipped: false);
 
-        _state = _state.copyWith(
+        _state = MemoryMatchState(
           cards: updatedCards,
-          moves: _state.moves + 1,
+          moves: newMoves,
+          matchedPairs: _state.matchedPairs,
+          isGameOver: false,
           firstFlippedIndex: null,
           secondFlippedIndex: null,
           isChecking: false,
