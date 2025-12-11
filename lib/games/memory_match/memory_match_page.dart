@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'memory_match_controller.dart';
+import 'memory_match_model.dart';
 
 class MemoryMatchPage extends StatelessWidget {
   const MemoryMatchPage({super.key});
@@ -19,7 +20,7 @@ class _MemoryMatchGameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<MemoryMatchController>();
+    final controller = context.watch<MemoryMatchController>();
     final state = controller.state;
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
@@ -41,7 +42,6 @@ class _MemoryMatchGameView extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: screenSize.width * 0.95,
-                    maxHeight: screenSize.height * 1.2,
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(

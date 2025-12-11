@@ -8,7 +8,13 @@ class HangmanController extends ChangeNotifier {
   bool _showDifficultySelection = true;
 
   HangmanController() {
-    newGame();
+    // Initialize with dummy state to avoid LateInitializationError
+    WordHint initialWord = getRandomWord();
+    _state = HangmanGameState(
+      word: initialWord.word,
+      hint: initialWord.hint,
+      difficulty: _selectedDifficulty,
+    );
   }
 
   HangmanGameState get state => _state;

@@ -31,7 +31,8 @@ class GamesMenuPage extends StatelessWidget {
               containerMaxWidth = maxWidthAvailable;
             }
 
-            final horizontalPadding = (maxWidthAvailable * 0.05).clamp(16, 48).toDouble();
+            // Slightly tighter padding to avoid overflow on small devices
+            final horizontalPadding = (maxWidthAvailable * 0.05).clamp(12, 32).toDouble();
 
             return Center(
               child: Container(
@@ -99,9 +100,9 @@ class _GamesGrid extends StatelessWidget {
       itemCount: games.length,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: maxTileWidth,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 1.1,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 0.95,
       ),
       itemBuilder: (ctx, index) {
         final game = games[index];

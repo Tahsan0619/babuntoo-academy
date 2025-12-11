@@ -63,8 +63,8 @@ class MemoryMatchState {
       moves: moves ?? this.moves,
       matchedPairs: matchedPairs ?? this.matchedPairs,
       isGameOver: isGameOver ?? this.isGameOver,
-      firstFlippedIndex: firstFlippedIndex ?? this.firstFlippedIndex,
-      secondFlippedIndex: secondFlippedIndex ?? this.secondFlippedIndex,
+      firstFlippedIndex: firstFlippedIndex,
+      secondFlippedIndex: secondFlippedIndex,
       isChecking: isChecking ?? this.isChecking,
     );
   }

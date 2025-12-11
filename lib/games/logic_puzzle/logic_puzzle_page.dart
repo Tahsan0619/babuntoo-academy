@@ -19,7 +19,7 @@ class _LogicPuzzleGameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<LogicPuzzleController>();
+    final controller = context.watch<LogicPuzzleController>();
     final state = controller.state;
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
@@ -41,7 +41,6 @@ class _LogicPuzzleGameView extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: screenSize.width * 0.95,
-                    maxHeight: screenSize.height * 1.3,
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(

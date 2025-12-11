@@ -55,7 +55,7 @@ class _TypingChallengeGameViewState extends State<_TypingChallengeGameView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<TypingChallengeController>();
+    final controller = context.watch<TypingChallengeController>();
     final state = controller.state;
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
@@ -78,7 +78,6 @@ class _TypingChallengeGameViewState extends State<_TypingChallengeGameView> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: screenSize.width * 0.95,
-                    maxHeight: screenSize.height * 1.2,
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(

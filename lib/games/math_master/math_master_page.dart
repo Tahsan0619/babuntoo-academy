@@ -51,7 +51,7 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<MathMasterController>();
+    final controller = context.watch<MathMasterController>();
     final state = controller.state;
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
@@ -73,7 +73,6 @@ class _MathMasterGameViewState extends State<_MathMasterGameView> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: screenSize.width * 0.95,
-                    maxHeight: screenSize.height * 1.2,
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
