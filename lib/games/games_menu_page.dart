@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../games/hangman/hangman_page.dart';
+import '../games/math_master/math_master_page.dart';
+import '../games/memory_match/memory_match_page.dart';
+import '../games/typing_challenge/typing_challenge_page.dart';
+import '../games/logic_puzzle/logic_puzzle_page.dart';
 
 class GamesMenuPage extends StatelessWidget {
   const GamesMenuPage({super.key});
@@ -9,7 +13,10 @@ class GamesMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: const Text('Games')),
+        appBar: AppBar(
+          title: const Text('Educational Games'),
+          elevation: 0,
+        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             final double maxWidthAvailable = constraints.maxWidth;
@@ -54,9 +61,42 @@ class _GamesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     const double maxTileWidth = 280;
 
+    final games = [
+      {
+        'title': 'Hangman',
+        'icon': Icons.abc,
+        'page': const HangmanPage(),
+        'description': 'Guess the word'
+      },
+      {
+        'title': 'Math Master',
+        'icon': Icons.calculate,
+        'page': const MathMasterPage(),
+        'description': 'Solve math problems'
+      },
+      {
+        'title': 'Memory Match',
+        'icon': Icons.grid_3x3,
+        'page': const MemoryMatchPage(),
+        'description': 'Find matching pairs'
+      },
+      {
+        'title': 'Typing Challenge',
+        'icon': Icons.keyboard,
+        'page': const TypingChallengePage(),
+        'description': 'Type fast & accurate'
+      },
+      {
+        'title': 'Logic Puzzle',
+        'icon': Icons.lightbulb,
+        'page': const LogicPuzzlePage(),
+        'description': 'Solve puzzles'
+      },
+    ];
+
     return GridView.builder(
       padding: EdgeInsets.zero,
-      itemCount: 1, // Increase this as you add more games
+      itemCount: games.length,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: maxTileWidth,
         mainAxisSpacing: 16,
@@ -64,11 +104,14 @@ class _GamesGrid extends StatelessWidget {
         childAspectRatio: 1.1,
       ),
       itemBuilder: (ctx, index) {
+        final game = games[index];
         return _GameCard(
-          title: 'Hangman', // Add other titles here as needed
-          icon: Icons.sentiment_very_satisfied,
+          title: game['title'] as String,
+          icon: game['icon'] as IconData,
           onTap: () {
-            Navigator.of(ctx).push(MaterialPageRoute(builder: (_) => const HangmanPage()));
+            Navigator.of(ctx).push(
+              MaterialPageRoute(builder: (_) => game['page'] as Widget),
+            );
           },
         );
       },
